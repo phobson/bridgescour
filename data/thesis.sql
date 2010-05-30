@@ -218,13 +218,12 @@ CREATE TABLE sgd
 (
   loc_id integer NOT NULL,
   tube_num integer NOT NULL,
-  sn integer NOT NULL,
   mpync double precision,
   temperature double precision,
   mtot double precision,
   mp double precision,
   mps double precision,
-  CONSTRAINT sgd_pkey PRIMARY KEY (loc_id, tube_num, sn)
+  CONSTRAINT sgd_pkey PRIMARY KEY (loc_id, tube_num)
 )
 WITH (
   OIDS=FALSE
