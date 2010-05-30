@@ -221,9 +221,9 @@ CREATE TABLE sgd
   sn integer NOT NULL,
   mpync double precision,
   temperature double precision,
-  m1 double precision,
-  m2 double precision,
-  m3 double precision,
+  mtot double precision,
+  mp double precision,
+  mps double precision,
   CONSTRAINT sgd_pkey PRIMARY KEY (loc_id, tube_num, sn)
 )
 WITH (
