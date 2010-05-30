@@ -1,0 +1,15 @@
+11	1	2.8453	this is the 2nd test - origingal discarded	14
+11	2	2.7428		16
+11	3	2.684		\N
+11	4	2.7826		\N
+12	1	2.9635	Hygroscopic sample was directly from oven-dry sediment	9
+12	2	2.7925	fine portion of sample	14
+13	1	2.762		13
+13	2	2.654		14
+14	1	2.6769		10
+14	2	2.6799		3
+14	3	2.7461		2
+15	1	2.5414		11
+15	2	2.4554		11
+15	3	2.6666		10
+15	4	2.6019		13

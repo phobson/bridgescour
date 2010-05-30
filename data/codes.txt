@@ -1,0 +1,22 @@
+101	None
+102	Large chunks
+103	End-of-sample
+104	Uniform
+105	Spotty
+106	Uniform, spotty
+107	Spotty, large chunks
+108	Uniform, spotty, large chunks
+109	Loose, end-of-sample
+110	Uniform, large chunks
+201	Extrusion
+202	Water content
+203	Liquid limit - Casagrande cup
+204	Liquid limit - cone penetration
+205	Plastic limit
+206	Hydrometer
+207	Erosion extrusion
+208	Lost
+209	Cut tube
+301	Hydrometer calibration
+302	Pyncometer calibration
+303	Shelby Tube cross sectional area
