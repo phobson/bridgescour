@@ -131,7 +131,7 @@ CREATE TABLE luhydrometer
 (
   loc_id integer NOT NULL,
   tube_num integer NOT NULL,
-  sg double precision,
+  mps double precision,
   note character varying(75),
   wcs_sn integer,
   CONSTRAINT luhydrometer_pkey PRIMARY KEY (loc_id, tube_num)
@@ -300,22 +300,21 @@ WITH (
 );
 ALTER TABLE ysd OWNER TO paul;
 
-COPY codes FROM '/home/paul/Documents/database/codes.txt' WITH DELIMITER AS E'\t';
-COPY calib FROM '/home/paul/Documents/database/calib.txt' WITH DELIMITER AS E'\t';
-COPY tubes FROM '/home/paul/Documents/database/tubes.txt' WITH DELIMITER AS E'\t';
-COPY wcs FROM '/home/paul/Documents/database/wcs.txt' WITH DELIMITER AS E'\t';
-COPY sieve FROM '/home/paul/Documents/database/sieve.txt' WITH DELIMITER AS E'\t';
-COPY omd FROM '/home/paul/Documents/database/omd.txt' WITH DELIMITER AS E'\t';
-COPY locations FROM '/home/paul/Documents/database/locations.txt' WITH DELIMITER AS E'\t';
-COPY sgd FROM '/home/paul/Documents/database/sgd.txt' WITH DELIMITER AS E'\t';
-COPY luhydrometer FROM '/home/paul/Documents/database/luhydrometer.txt' WITH DELIMITER AS E'\t';
-COPY hydrometer FROM '/home/paul/Documents/database/hydrometer.txt' WITH DELIMITER AS E'\t';
-COPY luextrusion FROM '/home/paul/Documents/database/luextrusion.txt' WITH DELIMITER AS E'\t';
-COPY extrusion FROM '/home/paul/Documents/database/extrusion.txt' WITH DELIMITER AS E'\t';
-COPY luerosion FROM '/home/paul/Documents/database/luerosion.txt' WITH DELIMITER AS E'\t';
-COPY erosion FROM '/home/paul/Documents/database/erosion.txt' WITH DELIMITER AS E'\t';
-COPY luysd FROM '/home/paul/Documents/database/luysd.txt' WITH DELIMITER AS E'\t';
-COPY ysd FROM '/home/paul/Documents/database/ysd.txt' WITH DELIMITER AS E'\t';
+COPY codes FROM '/home/paul/Documents/bridgescour/data/codes.txt' WITH DELIMITER AS E'\t';
+COPY calib FROM '/home/paul/Documents/bridgescour/data/calib.txt' WITH DELIMITER AS E'\t';
+COPY tubes FROM '/home/paul/Documents/bridgescour/data/tubes.txt' WITH DELIMITER AS E'\t';
+COPY wcs FROM '/home/paul/Documents/bridgescour/data/wcs.txt' WITH DELIMITER AS E'\t';
+COPY sieve FROM '/home/paul/Documents/bridgescour/data/sieve.txt' WITH DELIMITER AS E'\t';
+COPY omd FROM '/home/paul/Documents/bridgescour/data/omd.txt' WITH DELIMITER AS E'\t';
+COPY locations FROM '/home/paul/Documents/bridgescour/data/locations.txt' WITH DELIMITER AS E'\t';
+COPY sgd FROM '/home/paul/Documents/bridgescour/data/sgd.txt' WITH DELIMITER AS E'\t';
+COPY hydrometer FROM '/home/paul/Documents/bridgescour/data/hydrometer.txt' WITH DELIMITER AS E'\t';
+COPY luextrusion FROM '/home/paul/Documents/bridgescour/data/luextrusion.txt' WITH DELIMITER AS E'\t';
+COPY extrusion FROM '/home/paul/Documents/bridgescour/data/extrusion.txt' WITH DELIMITER AS E'\t';
+COPY luerosion FROM '/home/paul/Documents/bridgescour/data/luerosion.txt' WITH DELIMITER AS E'\t';
+COPY erosion FROM '/home/paul/Documents/bridgescour/data/erosion.txt' WITH DELIMITER AS E'\t';
+COPY luysd FROM '/home/paul/Documents/bridgescour/data/luysd.txt' WITH DELIMITER AS E'\t';
+COPY ysd FROM '/home/paul/Documents/bridgescour/data/ysd.txt' WITH DELIMITER AS E'\t';
 
 
 
