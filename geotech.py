@@ -19,7 +19,7 @@ See individual docstrings for help.
 
 from __future__ import division
 
-def connectToDB(cmd):
+def connectToDB(cmd=None):
     '''Connect to Erosiondatabase
     General function to connect to erosion database
 
@@ -35,8 +35,20 @@ def connectToDB(cmd):
     cnn = db.connect(host='localhost', user='paul', 
                      password=puppies, database='erosion')
     cur = cnn.cursor()
-    cur.execute(cmd)
+    if cmd:
+        cur.execute(cmd)
+
     return cnn, cur
+    
+def getCalibFactors(calib_type):
+    cmd = """SELECT * FROM calib
+             WHERE calib_type = """ % (calib_type,)
+    cnn, cur = connectToDB(cmd)
+    CF = cur.fetchone()[1:]
+    return CF
+    cnn.close()
+    
+
     
 def waterContent(loc_id, tube_num, sn):
     '''Water Content
@@ -69,21 +81,17 @@ def waterContent(loc_id, tube_num, sn):
 
 
 def specificGravity(loc_id, tube_num, sn):
-    calib_type = 302
-    cmd = "SELECT * FROM calib WHERE calib_type = %d" % (calib_type,)
-    cnn, cur = connectToDB(cmd)
-    pcf = cur.fetchone()[1:]
-
+    pyncCF = getCalibFactors(302)
     cmd = """SELECT mpync, mtot, mp, mps, temperature 
              FROM sgd 
              WHERE loc_id = %d
                AND tube_num = %d
                AND sn = %s""" % (loc_id, tube_num, sn)
-    cur.execute(cmd)
+    cnn, cur = connectToDB(cmd)
     Mpync, Mtot, Mp, Mps, temp = cur.fetchone()
 
     M1 = Mtot
-    M2 = pcf[0] + pcf[1]*temp + pcf[2]*temp**2
+    M2 = pyncCF[0] + pyncCF[1]*temp + pyncCF[2]*temp**2
     Ms = Mps - Mp
 
     sg = Ms / (Ms - M1 + M2)
@@ -137,6 +145,71 @@ def grainSize(loc_id, tube_num, plot=False):
                                [0.01388, 0.01365, 0.01342, 0.01321, 0.01301, 0.01282, 0.01264, 0.01246, 0.01229],
                                [0.01372, 0.01349, 0.01327, 0.01306, 0.01286, 0.01267, 0.01249, 0.01232, 0.01215],
                                [0.01357, 0.01334, 0.01312, 0.01291, 0.01272, 0.01253, 0.01235, 0.01218, 0.01201]])}
+    
+    # initialize output arrays
+    Dsve = np.array([])
+    Dhyd = np.array([])
+    PFsve = np.array([])
+    PFhyd = np.array([])
+    
+    Mret = np.array([])                         
+    # get the sieve data
+    cmd = """SELECT dsve, mtot-msve
+             FROM sieve
+             WHERE loc_id = %d AND tube_num = %d)""" % (loc_id, tube_num)
+    cnn, cur = connectToDB(cmd)
+    for row in cur:
+        Dsve = np.hstack([Dsve, row[0]])
+        Mret = np.hstack([Mret, row[1]])
+   
+    # read hydrometer data
+    cmd = """SELECT * time, hydr, temperature 
+             FROM hydrometer
+             WHERE loc_id = %d AND tube_num = %d""" % (loc_id, tube_num)
+    cur.execute(cmd)
+    time = np.array([])
+    hydr = np.array([])
+    temp = np.array([])
+
+    for row in cur:
+        time = np.hstack([time, row[0]])
+        hydr = np.hstack([hydr, row[1]])
+        temp = np.hstack([temp, row[2]])
+        
+    # get info about that hydrometer test
+    if len(time) = 0:
+        cumFracRet = Mret.cumsum()/Mret.sum()
+        PFsieve = (1 - cumFracRet[:-1]) * 100
+    
+    
+    else:    
+        cmd = """SELECT msw, wcs_sn 
+                 FROM luhydrometer
+                 WHERE loc_id = %d AND tube_num = %d""" % (loc_id, tube_num)
+        cur.execute(cmd)
+        msw, wcs_sn = cur.fetchone()
+        
+        cmd = """SELECT * FROM calib WHERE calib_type
+                """
+
+        # hygroscopic water content of hydrometer soil
+        wcHygro = waterContent(loc_id, tube_id, wcs_sn)
+        Ms = Msw / (1 + wcHygro)
+        
+        Mcoarse = Mret.sum()
+        Mfine = Ms - Mcoarse
+        n = len(Mret)
+        cumFracRet = Mret.cumsum()/Ms
+        PFsieve = (1 - cumFracRet[:-1]) * 100
+        
+        hydrCF = getCalibFactors(301)
+        hydrCorrection = hydrCF[0] + hydrCF[1] * temp + hydrCF[2] * temp**2
+        hydrFinal = hydr - hydrCorrection 
+
+
+
+
+
 
 
 
