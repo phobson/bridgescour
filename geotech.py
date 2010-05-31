@@ -80,13 +80,12 @@ def waterContent(loc_id, tube_num, sn):
     return wc
 
 
-def specificGravity(loc_id, tube_num, sn):
+def specificGravity(loc_id, tube_num):
     pyncCF = getCalibFactors(302)
     cmd = """SELECT mpync, mtot, mp, mps, temperature 
              FROM sgd 
              WHERE loc_id = %d
-               AND tube_num = %d
-               AND sn = %s""" % (loc_id, tube_num, sn)
+               AND tube_num = %d""" % (loc_id, tube_num)
     cnn, cur = connectToDB(cmd)
     Mpync, Mtot, Mp, Mps, temp = cur.fetchone()
 
@@ -114,6 +113,7 @@ def organicMatterConent(loc_id, tube_num):
 
 def grainSize(loc_id, tube_num, plot=False):
     import numpy as np
+    import NumUtils as nu
     import matplotlib.pyplot as pl
     
     # set up tables for hydrometer analysis (ASTM D 422)
@@ -128,8 +128,8 @@ def grainSize(loc_id, tube_num, plot=False):
                         13.5, 13.3, 13.2, 13.0, 12.9, 12.7, 12.5, 12.4,
                         12.2, 12.0, 11.9, 11.7, 11.5, 11.4, 11.2, 11.1,
                         10.9, 10.7, 10.6, 10.4, 10.2, 10.1,  9.9,  9.7,
-                         9.6,  9.4,  9.2,  9.1,  8.9.  8.6,  8.4,  8.3, 
-                         8.1,  7.9.  7.8.  7.6,  7.4,  7.3,  7.1,  7.0,
+                         9.6,  9.4,  9.2,  9.1,  8.9,  8.6,  8.4,  8.3, 
+                         8.1,  7.9,  7.8,  7.6,  7.4,  7.3,  7.1,  7.0,
                          6.8,  6.6, 6.5])}
 
     Table3 = {'SG' : np.arange(2.45,2.90,0.05),
@@ -177,10 +177,9 @@ def grainSize(loc_id, tube_num, plot=False):
         temp = np.hstack([temp, row[2]])
         
     # get info about that hydrometer test
-    if len(time) = 0:
+    if len(time) == 0:
         cumFracRet = Mret.cumsum()/Mret.sum()
         PFsieve = (1 - cumFracRet[:-1]) * 100
-    
     
     else:    
         cmd = """SELECT msw, wcs_sn 
@@ -204,7 +203,26 @@ def grainSize(loc_id, tube_num, plot=False):
         
         hydrCF = getCalibFactors(301)
         hydrCorrection = hydrCF[0] + hydrCF[1] * temp + hydrCF[2] * temp**2
-        hydrFinal = hydr - hydrCorrection 
+        hydrFinal = hydr - hydrCorrection
+        
+        SG = specificGravity(loc_id, tube_num)
+        
+        alpha = nu.linInterp(Table1['SG'], Table1['alpha'], SG)
+        PFhydro = hydroFinal * alpha / Ms * 100
+        
+        L = np.zeros(len(hydr))
+        K = np.zeros(len(hydr))
+        for n in range(len(hydr)):
+            L[n] = np.linInterp(Table2['AHyR'], Table2['EffD'], R[n])
+            K[n] = np.planeInterp(Table3['SG'], Table3['T'], Table3['K'], SG, temp[n])
+            
+        Dhyd = K * np.sqrt(L/time)
+        
+    D = np.hstack([Dsve, Dhyd])
+    PF = np.hstack([PFsieve, PFhydro])
+    
+    cnn.close()
+    return D, PF
 
 
 
