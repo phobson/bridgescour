@@ -42,7 +42,7 @@ def connectToDB(cmd=None):
     
 def getCalibFactors(calib_type):
     cmd = """SELECT * FROM calib
-             WHERE calib_type = """ % (calib_type,)
+             WHERE calib_type = %d""" % (calib_type)
     cnn, cur = connectToDB(cmd)
     CF = cur.fetchone()[1:]
     return CF
@@ -69,7 +69,7 @@ def waterContent(loc_id, tube_num, sn):
              WHERE loc_id = %d
                AND tube_num = %d
                AND sn = %s""" % (loc_id, tube_num, sn)
-    cnn, cur = connetToDB(cmd)
+    cnn, cur = connectToDB(cmd)
     Mpsw, Mps, Mp = cur.fetchone()
 
     Mw = Mpsw - Mps
@@ -113,7 +113,7 @@ def organicMatterConent(loc_id, tube_num):
 
 def grainSize(loc_id, tube_num, plot=False):
     import numpy as np
-    import NumUtils as nu
+    import scipy.interpolate as spi
     import matplotlib.pyplot as pl
     
     # set up tables for hydrometer analysis (ASTM D 422)
@@ -125,12 +125,11 @@ def grainSize(loc_id, tube_num, plot=False):
               'EffD' : np.array([16.3, 16.1, 16.0, 15.8, 15.6, 15.5, 15.3, 15.2,
                         15.0, 14.8, 14.7, 14.5, 14.3, 14.2, 14.0, 13.8,
                         13.7, 13.5, 13.3, 13.2, 13.0, 12.9, 12.7, 12.5,
-                        13.5, 13.3, 13.2, 13.0, 12.9, 12.7, 12.5, 12.4,
-                        12.2, 12.0, 11.9, 11.7, 11.5, 11.4, 11.2, 11.1,
-                        10.9, 10.7, 10.6, 10.4, 10.2, 10.1,  9.9,  9.7,
-                         9.6,  9.4,  9.2,  9.1,  8.9,  8.6,  8.4,  8.3, 
-                         8.1,  7.9,  7.8,  7.6,  7.4,  7.3,  7.1,  7.0,
-                         6.8,  6.6, 6.5])}
+                        12.4, 12.2, 12.0, 11.9, 11.7, 11.5, 11.4, 11.2, 
+                        11.1, 10.9, 10.7, 10.6, 10.4, 10.2, 10.1,  9.9,  
+                         9.7,  9.6,  9.4,  9.2,  9.1,  8.9,  8.8,  8.6,  
+                         8.4,  8.3,  8.1,  7.9,  7.8,  7.6,  7.4,  7.3,  
+                         7.1,  7.0,  6.8,  6.6, 6.5])}
 
     Table3 = {'SG' : np.arange(2.45,2.90,0.05),
               'T'  : np.arange(16.0,31.0,1.0),
@@ -144,8 +143,15 @@ def grainSize(loc_id, tube_num, plot=False):
                                [0.01404, 0.01381, 0.01358, 0.01337, 0.01317, 0.01297, 0.01279, 0.01261, 0.01243],
                                [0.01388, 0.01365, 0.01342, 0.01321, 0.01301, 0.01282, 0.01264, 0.01246, 0.01229],
                                [0.01372, 0.01349, 0.01327, 0.01306, 0.01286, 0.01267, 0.01249, 0.01232, 0.01215],
-                               [0.01357, 0.01334, 0.01312, 0.01291, 0.01272, 0.01253, 0.01235, 0.01218, 0.01201]])}
-    
+                               [0.01357, 0.01334, 0.01312, 0.01291, 0.01272, 0.01253, 0.01235, 0.01218, 0.01201],
+                               [0.01342, 0.01319, 0.01297, 0.01277, 0.01258, 0.01329, 0.01221, 0.01204, 0.01188],
+                               [0.01327, 0.01304, 0.01283, 0.01264, 0.01255, 0.01244, 0.01208, 0.01191, 0.01175],
+                               [0.01312, 0.01290, 0.01269, 0.01249, 0.01230, 0.01212, 0.01195, 0.01178, 0.01162],
+                               [0.01298, 0.01276, 0.01256, 0.01236, 0.01217, 0.01199, 0.01182, 0.01165, 0.01149]])}
+    table1Interp = spi.interp1d(Table1['SG'], Table1['alpha'])
+    table2Interp = spi.interp1d(Table2['AHyR'], Table2['EffD'])
+    table3Interp = spi.interp2d(Table3['SG'], Table3['T'], Table3['K'])
+
     # initialize output arrays
     Dsve = np.array([])
     Dhyd = np.array([])
@@ -156,14 +162,14 @@ def grainSize(loc_id, tube_num, plot=False):
     # get the sieve data
     cmd = """SELECT dsve, mtot-msve
              FROM sieve
-             WHERE loc_id = %d AND tube_num = %d)""" % (loc_id, tube_num)
+             WHERE loc_id = %d AND tube_num = %d""" % (loc_id, tube_num)
     cnn, cur = connectToDB(cmd)
     for row in cur:
         Dsve = np.hstack([Dsve, row[0]])
         Mret = np.hstack([Mret, row[1]])
    
     # read hydrometer data
-    cmd = """SELECT * time, hydr, temperature 
+    cmd = """SELECT time, hydr, temperature 
              FROM hydrometer
              WHERE loc_id = %d AND tube_num = %d""" % (loc_id, tube_num)
     cur.execute(cmd)
@@ -186,13 +192,10 @@ def grainSize(loc_id, tube_num, plot=False):
                  FROM luhydrometer
                  WHERE loc_id = %d AND tube_num = %d""" % (loc_id, tube_num)
         cur.execute(cmd)
-        msw, wcs_sn = cur.fetchone()
+        Msw, wcs_sn = cur.fetchone()
         
-        cmd = """SELECT * FROM calib WHERE calib_type
-                """
-
         # hygroscopic water content of hydrometer soil
-        wcHygro = waterContent(loc_id, tube_id, wcs_sn)
+        wcHygro = waterContent(loc_id, tube_num, wcs_sn)
         Ms = Msw / (1 + wcHygro)
         
         Mcoarse = Mret.sum()
@@ -207,22 +210,52 @@ def grainSize(loc_id, tube_num, plot=False):
         
         SG = specificGravity(loc_id, tube_num)
         
-        alpha = nu.linInterp(Table1['SG'], Table1['alpha'], SG)
-        PFhydro = hydroFinal * alpha / Ms * 100
+        alpha = table1Interp(SG)
+        PFhydro = hydrFinal * alpha / Ms * 100
         
         L = np.zeros(len(hydr))
         K = np.zeros(len(hydr))
         for n in range(len(hydr)):
-            L[n] = np.linInterp(Table2['AHyR'], Table2['EffD'], R[n])
-            K[n] = np.planeInterp(Table3['SG'], Table3['T'], Table3['K'], SG, temp[n])
+            L[n] = table2Interp(hydr[n])
+            K[n] = table3Interp(SG, temp[n])
             
         Dhyd = K * np.sqrt(L/time)
         
-    D = np.hstack([Dsve, Dhyd])
+    D = np.hstack([Dsve[:-1], Dhyd])
     PF = np.hstack([PFsieve, PFhydro])
+
+    label = None
+    if plot:
+        cmd = """SELECT L.county, T.top, T.bottom
+                 FROM tubes T
+                 INNER JOIN locations L ON T.loc_id = L.id
+                 WHERE T.loc_id = %d AND T.num = %d""" % (loc_id, tube_num)
+        cur.execute(cmd)
+        tubeInfo = cur.fetchone()
+        Label = '%s %0.1f ft to %0.1f ft' % tubeInfo
+        print(Label)
+
+        
+        import matplotlib.pyplot as pl
+        fig = pl.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(D, PF, 'ko', ms=6, label=Label)
+        ax.set_ylabel('Percent Finer')
+        ax.set_xlabel('Particle Size, mm')
+        ax.legend(loc='lower right')
+        ax.set_xscale('log')
+        ax.set_ylim([0,100])
+        
+
+        fig.savefig('%s%d.pdf' % (tubeInfo[0], tube_num), 
+                    dpi=300, bbox_inches='tight')
+        pl.close(fig)
+
+
+
     
     cnn.close()
-    return D, PF
+    return D, PF, Label
 
 
 

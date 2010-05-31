@@ -210,8 +210,8 @@ def smooth(x, delta=11, type='hanning', order=4):
     '''
     import numpy as np
     
-    if type == 'savitsky golay'
-        smooth_data = savitsky_golay(x, kernel=delta, order=order):
+    if type == 'savitsky golay':
+        smooth_data = savitsky_golay(x, kernel=delta, order=order)
         
     else:            
         if x.ndim != 1:
