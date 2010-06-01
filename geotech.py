@@ -242,7 +242,6 @@ def grainSize(loc_id, tube_num, plot=False):
         tubeInfo = cur.fetchone()
         Label = '%s %0.1f ft to %0.1f ft' % tubeInfo
         print(Label)
-
         
         import matplotlib.pyplot as pl
         fig = pl.figure()
@@ -252,15 +251,11 @@ def grainSize(loc_id, tube_num, plot=False):
         ax.set_xlabel('Particle Size, mm')
         ax.legend(loc='lower right')
         ax.set_xscale('log')
-        ax.set_ylim([0,100])
-        
+        ax.set_ylim([0,100])     
 
         fig.savefig('%s%d.pdf' % (tubeInfo[0], tube_num), 
                     dpi=300, bbox_inches='tight')
         pl.close(fig)
-
-
-
     
     cnn.close()
     return D, PF, Label
@@ -269,8 +264,7 @@ def liquidLimit(loc_id, tube_num):
     '''LIQUID LIMIT OF A SOIL SAMPLE
     '''
     import numpy as np
-    import scipy.interpolate as spi
-
+    
     cmd = """SELECT sn, result, wcs_type
              FROM wcs
              WHERE loc_id = %d
@@ -284,23 +278,29 @@ def liquidLimit(loc_id, tube_num):
         wc = np.hstack([wc, waterContent(loc_id, tube_num, row[0])])
         x = np.hstack([x, row[1]])
         LL_type = row[2]
-    
 
-    if LL_type == 203:
-        x_ = 25
-        P = np.arange(10,36)
-        LegLoc = 'lower left'
-        xlab = 'Number of Blows'
+    cnn.close()
+    return wc, x, LL_type
 
-    elif LL_type == 204:
-        x_ = 20
-        P = np.arange(10,31)
-        LegLoc = 'lower right'
-        xlab = 'Cone Penetration, mm'
+def plasticLimit(loc_id, tube_num):
+    '''PLASTIC LIMIT OF A SOIL SAMPLe
+    '''
 
-    return wc, x
+    import numpy as np
 
+    cmd = """SELECT sn FROM wcs
+             WHERE loc_id = %d
+             AND tube_num = %d
+             AND wcs_type = 205""" % (loc_id, tube_num)
+    cnn, cur = connectToDB(cmd)
+    wc = np.array([])
+    for row in cur:
+        wc = np.hstack([wc, waterContent(loc_id, tube_num, row[0])])
 
+    PL = wc.mean()
+
+    cnn.close()
+    return PL
 
 def atterbergLimits(loc_id, tube_num, plot=0):
     '''ATTERBERG LIMITS OF A SOIL SAMPLE
@@ -320,6 +320,24 @@ def atterbergLimits(loc_id, tube_num, plot=0):
         LL - liquid limit
         PL - plastic limit
     '''
+    import numpy as np
+    import scipy.stats as sps
+    wc, x, LL_type = liquidLimit(loc_id, tube_num)
+    fit = sps.lingress(x, wc)
 
+    if LL_type == 203:
+        x_ = 25
+        P = np.arange(10,36)
+        LegLoc = 'lower left'
+        xlab = 'Number of Blows'
 
-    
+    elif LL_type == 204:
+        x_ = 20
+        P = np.arange(10,31)
+        LegLoc = 'lower right'
+        xlab = 'Cone Penetration, mm'
+
+   LL =  fit[1] * 10**(fit[0]*x_)
+   PL = plasticLimit(loc_id, tube_num)
+
+   return LL, PL
