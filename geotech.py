@@ -51,19 +51,16 @@ def getCalibFactors(calib_type):
 
     
 def waterContent(loc_id, tube_num, sn):
-    '''Water Content
+    '''WATER CONTENT OF A SOIL SAMPLE
     Function to compute the water content of a sample
-    Inputs:
-        loc_id: Location ID in Erosion database ('locations' table)
-        tube_num: tube number ('tubes' table)
-        sn: sample number to computer WC ('wcs' table)
-    Outputs: wc - decimal fraction water content of sample (float)
-    Usage:
-        import geotech
-        wc = geotech(waterContent(11, 1, 1)
-        print(wc)
 
+    Inputs:
+        loc_id - Location ID in Erosion database ('locations' table)
+        tube_num - tube number ('tubes' table)
+        sn - sample number to computer WC ('wcs' table)
+    Outputs: wc - decimal fraction water content of sample (float)
     '''
+    
     cmd = """SELECT mpsw, mps, mp 
              FROM wcs 
              WHERE loc_id = %d
@@ -81,6 +78,16 @@ def waterContent(loc_id, tube_num, sn):
 
 
 def specificGravity(loc_id, tube_num):
+    '''SPECIFIC GRAVITY OF A SOIL SAMPLE
+    Function to compute the specific gravity of a soil sample as measured in a 
+    pyncometer.
+    
+    Inputs:
+        loc_id - Location ID in Erosion database ('locations' table)
+        tube_num - tube number ('tubes' table)
+    Outputs: SG - specific gravity of sample    
+    '''
+    
     pyncCF = getCalibFactors(302)
     cmd = """SELECT mpync, mtot, mp, mps, temperature 
              FROM sgd 
@@ -122,7 +129,8 @@ def grainSize(loc_id, tube_num, plot=False):
     Table1['alpha'][0] = 1.05  # minor correction
 
     Table2 = {'AHyR' : np.arange(0,61),
-              'EffD' : np.array([16.3, 16.1, 16.0, 15.8, 15.6, 15.5, 15.3, 15.2,
+              'EffD' : np.array([
+                        16.3, 16.1, 16.0, 15.8, 15.6, 15.5, 15.3, 15.2,
                         15.0, 14.8, 14.7, 14.5, 14.3, 14.2, 14.0, 13.8,
                         13.7, 13.5, 13.3, 13.2, 13.0, 12.9, 12.7, 12.5,
                         12.4, 12.2, 12.0, 11.9, 11.7, 11.5, 11.4, 11.2, 
@@ -257,10 +265,61 @@ def grainSize(loc_id, tube_num, plot=False):
     cnn.close()
     return D, PF, Label
 
+def liquidLimit(loc_id, tube_num):
+    '''LIQUID LIMIT OF A SOIL SAMPLE
+    '''
+    import numpy as np
+    import scipy.interpolate as spi
+
+    cmd = """SELECT sn, result, wcs_type
+             FROM wcs
+             WHERE loc_id = %d
+             AND tube_num = %d
+             AND wcs_type IN (203,204)""" % (loc_id, tube_num)
+    cnn, cur = connectToDB(cmd)
+    wc = np.array([])
+    x = np.array([])
+
+    for row in cur:
+        wc = np.hstack([wc, waterContent(loc_id, tube_num, row[0])])
+        x = np.hstack([x, row[1]])
+        LL_type = row[2]
+    
+
+    if LL_type == 203:
+        x_ = 25
+        P = np.arange(10,36)
+        LegLoc = 'lower left'
+        xlab = 'Number of Blows'
+
+    elif LL_type == 204:
+        x_ = 20
+        P = np.arange(10,31)
+        LegLoc = 'lower right'
+        xlab = 'Cone Penetration, mm'
+
+    return wc, x
 
 
 
+def atterbergLimits(loc_id, tube_num, plot=0):
+    '''ATTERBERG LIMITS OF A SOIL SAMPLE
+    The function determines the Liquie Limit (LL) and Plastic Limit (PL) of a 
+    soil sample. The Plasticity Index (PI) can be computed as PI = LL - PL.
+
+    Inputs:
+        loc_id -  Location ID in Erosion database ('locations' table)
+        tube_num -  tube number ('tubes' table)
+        plot -  toggles plotting functionality
+            0: no plotting (default)
+            1: plot the PL and LL test results
+            2: plot data point on standard Plasticity Chart
+            3: plot options 1+2 on same figure
+
+    Outputs:
+        LL - liquid limit
+        PL - plastic limit
+    '''
 
 
-
-
+    
