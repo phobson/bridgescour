@@ -322,8 +322,9 @@ def atterbergLimits(loc_id, tube_num, plot=0):
     '''
     import numpy as np
     import scipy.stats as sps
+    import matplotlib.pyplot as pl
     wc, x, LL_type = liquidLimit(loc_id, tube_num)
-    fit = sps.lingress(x, wc)
+    fit = sps.linregress(x, wc)
 
     if LL_type == 203:
         x_ = 25
@@ -337,7 +338,22 @@ def atterbergLimits(loc_id, tube_num, plot=0):
         LegLoc = 'lower right'
         xlab = 'Cone Penetration, mm'
 
-   LL =  fit[1] * 10**(fit[0]*x_)
-   PL = plasticLimit(loc_id, tube_num)
+    LL =  fit[1] * 10**(fit[0]*x_)
+    PL = plasticLimit(loc_id, tube_num)
 
-   return LL, PL
+    return LL, PL
+
+    if plot == 1 :
+        fig = pl.figure()
+        ax1 = pl.add_subplot(1,2,1)
+        ax1.plot(wc, x, 'ko', label='Test data')
+        ax1.plot(wc_, x_, 'r*', label='Liquid Limit')
+        ax1.plot(P, fit[1] * 10**(fit[0]*P))
+        pl.show()
+       
+       
+        ax2 = pl.add_subplot(1,2,2)
+        fig.savefig('test.pdf')
+
+       
+
