@@ -4,7 +4,7 @@ Performs all calculations related to the geotechnical aspects of samples tested 
 School of Civil and Environmental Engineering and the stress-controlled 
 rheometer in the Complex Fluids Laboratory.
 
-Available functions include:
+Available functions intended to be call individually include:
 waterConent(loc_id, tube_num, sn)
 specificGravity(loc_id, tube_num)
 organicMatterContent(loc_id. tube_num)
@@ -343,17 +343,22 @@ def atterbergLimits(loc_id, tube_num, plot=0):
 
 
 
-    if plot == 1:
-        fig = pl.figure()
-        ax1 = fig.add_subplot(1,2,1)
+    
+      
+    def plotLLandPL(ax1, ax2): 
         ax1.plot(x, wc,'ko', label='Test data')
         ax1.plot(x_, LL, 'r*', label='Liquid Limit')
-        ax1.plot(P, fit[1] * 10**(fit[0]*P))
-        pl.show()
-       
+        ax1.plot(P, fit[1] * 10**(fit[0]*P), 'b-', lw=2, label='Best-fit Line')
+        ax1.plot([x_, x_, 0], [0, LL, LL], 'k-', lw=1, label='_nolegend')
+        ax1.set_xscale('log')
+        ax1.set_xlabel(xlab)
+        ax1.set_ylabel(r'Water Content, $w$ (\%)')
+        ax1.legend(loc=LegLoc)
               
         ax2 = fig.add_subplot(1,2,2)
         fig.savefig('test.pdf')
+
+        pl.close(fig)
 
        
     return LL, PL
