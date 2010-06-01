@@ -341,19 +341,20 @@ def atterbergLimits(loc_id, tube_num, plot=0):
     LL =  fit[1] * 10**(fit[0]*x_)
     PL = plasticLimit(loc_id, tube_num)
 
-    return LL, PL
 
-    if plot == 1 :
+
+    if plot == 1:
         fig = pl.figure()
-        ax1 = pl.add_subplot(1,2,1)
-        ax1.plot(wc, x, 'ko', label='Test data')
-        ax1.plot(wc_, x_, 'r*', label='Liquid Limit')
+        ax1 = fig.add_subplot(1,2,1)
+        ax1.plot(x, wc,'ko', label='Test data')
+        ax1.plot(x_, LL, 'r*', label='Liquid Limit')
         ax1.plot(P, fit[1] * 10**(fit[0]*P))
         pl.show()
        
-       
-        ax2 = pl.add_subplot(1,2,2)
+              
+        ax2 = fig.add_subplot(1,2,2)
         fig.savefig('test.pdf')
 
        
+    return LL, PL
 
