@@ -40,7 +40,7 @@ def connectToDB(cmd=None):
         cur.execute(cmd)
 
     return cnn, cur
-    
+
 def getCalibFactors(calib_type):
     cmd = """SELECT * FROM calib
              WHERE calib_type = %d""" % (calib_type)
@@ -48,9 +48,9 @@ def getCalibFactors(calib_type):
     CF = cur.fetchone()[1:]
     return CF
     cnn.close()
-    
 
-    
+
+
 def waterContent(loc_id, tube_num, sn):
     '''WATER CONTENT OF A SOIL SAMPLE
     Function to compute the water content of a sample
@@ -61,9 +61,9 @@ def waterContent(loc_id, tube_num, sn):
         sn - sample number to computer WC ('wcs' table)
     Outputs: wc - decimal fraction water content of sample (float)
     '''
-    
-    cmd = """SELECT mpsw, mps, mp 
-             FROM wcs 
+
+    cmd = """SELECT mpsw, mps, mp
+             FROM wcs
              WHERE loc_id = %d
                AND tube_num = %d
                AND sn = %s""" % (loc_id, tube_num, sn)
@@ -73,25 +73,25 @@ def waterContent(loc_id, tube_num, sn):
     Mw = Mpsw - Mps
     Ms = Mps - Mp
     wc = Mw/Ms
-    
+
     cnn.close()
     return wc
 
 
 def specificGravity(loc_id, tube_num):
     '''SPECIFIC GRAVITY OF A SOIL SAMPLE
-    Function to compute the specific gravity of a soil sample as measured in a 
+    Function to compute the specific gravity of a soil sample as measured in a
     pyncometer.
-    
+
     Inputs:
         loc_id - Location ID in Erosion database ('locations' table)
         tube_num - tube number ('tubes' table)
-    Outputs: SG - specific gravity of sample    
+    Outputs: SG - specific gravity of sample
     '''
-    
+
     pyncCF = getCalibFactors(302)
-    cmd = """SELECT mpync, mtot, mp, mps, temperature 
-             FROM sgd 
+    cmd = """SELECT mpync, mtot, mp, mps, temperature
+             FROM sgd
              WHERE loc_id = %d
                AND tube_num = %d""" % (loc_id, tube_num)
     cnn, cur = connectToDB(cmd)
@@ -106,9 +106,9 @@ def specificGravity(loc_id, tube_num):
     return sg
 
 def organicMatterConent(loc_id, tube_num):
-    cmd = """SELECT mpsa, mps, mp 
-             FROM omd 
-             WHERE loc_id = %d 
+    cmd = """SELECT mpsa, mps, mp
+             FROM omd
+             WHERE loc_id = %d
                AND tube_num = %d""" % (loc_id, tube_num)
     cnn, cur = connectToDB(cmd)
     Mpsa, Mps, Mp = cur.fetchone()
@@ -123,7 +123,7 @@ def grainSize(loc_id, tube_num, plot=False):
     import numpy as np
     import scipy.interpolate as spi
     import matplotlib.pyplot as pl
-    
+
     # set up tables for hydrometer analysis (ASTM D 422)
     Table1 = {'SG'    : np.arange(2.45, 3.00, 0.05),
               'alpha' : np.arange(1.04, 0.93, -0.01)}
@@ -142,35 +142,35 @@ def grainSize(loc_id, tube_num, plot=False):
 
     Table3 = {'SG' : np.arange(2.45,2.90,0.05),
               'T'  : np.arange(16.0,31.0,1.0),
-              'K'  : np.array([[0.01530, 0.01505, 0.01481, 0.01457, 0.01435, 
+              'K'  : np.array([[0.01530, 0.01505, 0.01481, 0.01457, 0.01435,
                                          0.01414, 0.01394, 0.01374, 0.01356],
-                               [0.01511, 0.01486, 0.01462, 0.01439, 0.01417, 
+                               [0.01511, 0.01486, 0.01462, 0.01439, 0.01417,
                                          0.01396, 0.01376, 0.01356, 0.01338],
-                               [0.01492, 0.01467, 0.01443, 0.01421, 0.01399, 
+                               [0.01492, 0.01467, 0.01443, 0.01421, 0.01399,
                                          0.01378, 0.01359, 0.01339, 0.01321],
-                               [0.01474, 0.01449, 0.01425, 0.01403, 0.01382, 
+                               [0.01474, 0.01449, 0.01425, 0.01403, 0.01382,
                                          0.01361, 0.01342, 0.01323, 0.01305],
-                               [0.01456, 0.01431, 0.01408, 0.01386, 0.01365, 
+                               [0.01456, 0.01431, 0.01408, 0.01386, 0.01365,
                                          0.01344, 0.01325, 0.01307, 0.01289],
-                               [0.01438, 0.01414, 0.01391, 0.01374, 0.01369, 
+                               [0.01438, 0.01414, 0.01391, 0.01374, 0.01369,
                                          0.01348, 0.01328, 0.01291, 0.01273],
-                               [0.01421, 0.01397, 0.01374, 0.01353, 0.01332, 
+                               [0.01421, 0.01397, 0.01374, 0.01353, 0.01332,
                                          0.01312, 0.01294, 0.01276, 0.01258],
-                               [0.01404, 0.01381, 0.01358, 0.01337, 0.01317, 
+                               [0.01404, 0.01381, 0.01358, 0.01337, 0.01317,
                                          0.01297, 0.01279, 0.01261, 0.01243],
-                               [0.01388, 0.01365, 0.01342, 0.01321, 0.01301, 
+                               [0.01388, 0.01365, 0.01342, 0.01321, 0.01301,
                                          0.01282, 0.01264, 0.01246, 0.01229],
-                               [0.01372, 0.01349, 0.01327, 0.01306, 0.01286, 
+                               [0.01372, 0.01349, 0.01327, 0.01306, 0.01286,
                                          0.01267, 0.01249, 0.01232, 0.01215],
-                               [0.01357, 0.01334, 0.01312, 0.01291, 0.01272, 
+                               [0.01357, 0.01334, 0.01312, 0.01291, 0.01272,
                                          0.01253, 0.01235, 0.01218, 0.01201],
-                               [0.01342, 0.01319, 0.01297, 0.01277, 0.01258, 
+                               [0.01342, 0.01319, 0.01297, 0.01277, 0.01258,
                                          0.01329, 0.01221, 0.01204, 0.01188],
-                               [0.01327, 0.01304, 0.01283, 0.01264, 0.01255, 
+                               [0.01327, 0.01304, 0.01283, 0.01264, 0.01255,
                                          0.01244, 0.01208, 0.01191, 0.01175],
-                               [0.01312, 0.01290, 0.01269, 0.01249, 0.01230, 
+                               [0.01312, 0.01290, 0.01269, 0.01249, 0.01230,
                                          0.01212, 0.01195, 0.01178, 0.01162],
-                               [0.01298, 0.01276, 0.01256, 0.01236, 0.01217, 
+                               [0.01298, 0.01276, 0.01256, 0.01236, 0.01217,
                                          0.01199, 0.01182, 0.01165, 0.01149]])}
     table1Interp = spi.interp1d(Table1['SG'], Table1['alpha'])
     table2Interp = spi.interp1d(Table2['AHyR'], Table2['EffD'])
@@ -181,8 +181,8 @@ def grainSize(loc_id, tube_num, plot=False):
     Dhyd = np.array([])
     PFsve = np.array([])
     PFhyd = np.array([])
-    
-    Mret = np.array([])                         
+
+    Mret = np.array([])
     # get the sieve data
     cmd = """SELECT dsve, mtot-msve
              FROM sieve
@@ -191,9 +191,9 @@ def grainSize(loc_id, tube_num, plot=False):
     for row in cur:
         Dsve = np.hstack([Dsve, row[0]])
         Mret = np.hstack([Mret, row[1]])
-   
+
     # read hydrometer data
-    cmd = """SELECT time, hydr, temperature 
+    cmd = """SELECT time, hydr, temperature
              FROM hydrometer
              WHERE loc_id = %d AND tube_num = %d""" % (loc_id, tube_num)
     cur.execute(cmd)
@@ -205,46 +205,46 @@ def grainSize(loc_id, tube_num, plot=False):
         time = np.hstack([time, row[0]])
         hydr = np.hstack([hydr, row[1]])
         temp = np.hstack([temp, row[2]])
-        
+
     # get info about that hydrometer test
     if len(time) == 0:
         cumFracRet = Mret.cumsum()/Mret.sum()
         PFsieve = (1 - cumFracRet[:-1]) * 100
-    
-    else:    
+
+    else:
         cmd = """SELECT msw, wcs_sn 
                  FROM luhydrometer
                  WHERE loc_id = %d AND tube_num = %d""" % (loc_id, tube_num)
         cur.execute(cmd)
         Msw, wcs_sn = cur.fetchone()
-        
+
         # hygroscopic water content of hydrometer soil
         wcHygro = waterContent(loc_id, tube_num, wcs_sn)
         Ms = Msw / (1 + wcHygro)
-        
+
         Mcoarse = Mret.sum()
         Mfine = Ms - Mcoarse
         n = len(Mret)
         cumFracRet = Mret.cumsum()/Ms
         PFsieve = (1 - cumFracRet[:-1]) * 100
-        
+
         hydrCF = getCalibFactors(301)
         hydrCorrection = hydrCF[0] + hydrCF[1] * temp + hydrCF[2] * temp**2
         hydrFinal = hydr - hydrCorrection
-        
+
         SG = specificGravity(loc_id, tube_num)
-        
+
         alpha = table1Interp(SG)
         PFhydro = hydrFinal * alpha / Ms * 100
-        
+
         L = np.zeros(len(hydr))
         K = np.zeros(len(hydr))
         for n in range(len(hydr)):
             L[n] = table2Interp(hydr[n])
             K[n] = table3Interp(SG, temp[n])
-            
+
         Dhyd = K * np.sqrt(L/time)
-        
+
     D = np.hstack([Dsve[:-1], Dhyd])
     PF = np.hstack([PFsieve, PFhydro])
 
@@ -258,7 +258,7 @@ def grainSize(loc_id, tube_num, plot=False):
         tubeInfo = cur.fetchone()
         Label = '%s %0.1f ft to %0.1f ft' % tubeInfo
         print(Label)
-        
+
         import matplotlib.pyplot as pl
         fig = pl.figure()
         ax = fig.add_subplot(111)
@@ -267,12 +267,12 @@ def grainSize(loc_id, tube_num, plot=False):
         ax.set_xlabel('Particle Size, mm')
         ax.legend(loc='lower right')
         ax.set_xscale('log')
-        ax.set_ylim([0,100])     
+        ax.set_ylim([0,100])
 
-        fig.savefig('%s%d.pdf' % (tubeInfo[0], tube_num), 
+        fig.savefig('%s%d.pdf' % (tubeInfo[0], tube_num),
                     dpi=300, bbox_inches='tight')
         pl.close(fig)
-    
+
     cnn.close()
     return D, PF, Label
 
@@ -280,7 +280,7 @@ def liquidLimit(loc_id, tube_num):
     '''LIQUID LIMIT OF A SOIL SAMPLE
     '''
     import numpy as np
-    
+
     cmd = """SELECT sn, result, wcs_type
              FROM wcs
              WHERE loc_id = %d
