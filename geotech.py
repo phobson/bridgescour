@@ -134,10 +134,10 @@ def grainSize(loc_id, tube_num, plot=False):
                         16.3, 16.1, 16.0, 15.8, 15.6, 15.5, 15.3, 15.2,
                         15.0, 14.8, 14.7, 14.5, 14.3, 14.2, 14.0, 13.8,
                         13.7, 13.5, 13.3, 13.2, 13.0, 12.9, 12.7, 12.5,
-                        12.4, 12.2, 12.0, 11.9, 11.7, 11.5, 11.4, 11.2, 
-                        11.1, 10.9, 10.7, 10.6, 10.4, 10.2, 10.1,  9.9,  
-                         9.7,  9.6,  9.4,  9.2,  9.1,  8.9,  8.8,  8.6,  
-                         8.4,  8.3,  8.1,  7.9,  7.8,  7.6,  7.4,  7.3,  
+                        12.4, 12.2, 12.0, 11.9, 11.7, 11.5, 11.4, 11.2,
+                        11.1, 10.9, 10.7, 10.6, 10.4, 10.2, 10.1,  9.9,
+                         9.7,  9.6,  9.4,  9.2,  9.1,  8.9,  8.8,  8.6,
+                         8.4,  8.3,  8.1,  7.9,  7.8,  7.6,  7.4,  7.3,
                          7.1,  7.0,  6.8,  6.6, 6.5])}
 
     Table3 = {'SG' : np.arange(2.45,2.90,0.05),
@@ -212,7 +212,7 @@ def grainSize(loc_id, tube_num, plot=False):
         PFsieve = (1 - cumFracRet[:-1]) * 100
 
     else:
-        cmd = """SELECT msw, wcs_sn 
+        cmd = """SELECT msw, wcs_sn
                  FROM luhydrometer
                  WHERE loc_id = %d AND tube_num = %d""" % (loc_id, tube_num)
         cur.execute(cmd)
@@ -320,7 +320,7 @@ def plasticLimit(loc_id, tube_num):
 
 def atterbergLimits(loc_id, tube_num, plot=0):
     '''ATTERBERG LIMITS OF A SOIL SAMPLE
-    The function determines the Liquie Limit (LL) and Plastic Limit (PL) of a 
+    The function determines the Liquie Limit (LL) and Plastic Limit (PL) of a
     soil sample. The Plasticity Index (PI) can be computed as PI = LL - PL.
 
     Inputs:
@@ -339,38 +339,42 @@ def atterbergLimits(loc_id, tube_num, plot=0):
     import numpy as np
     import scipy.stats as sps
     import matplotlib.pyplot as pl
+
     wc, x, LL_type = liquidLimit(loc_id, tube_num)
-    fit = sps.linregress(x, wc)
+    fit = sps.linregress(np.log10(x), wc)
 
     if LL_type == 203:
         x_ = 25
-        P = np.arange(10,36)
+        P = np.arange(10,45)
         LegLoc = 'lower left'
-        xlab = 'Number of Blows'
+        xlab = r'Number of Blows, $N$'
+        dlab = 'Casagrande cup data'
 
     elif LL_type == 204:
         x_ = 20
-        P = np.arange(10,31)
+        P = np.arange(10,45)
         LegLoc = 'lower right'
-        xlab = 'Cone Penetration, mm'
+        xlab = r'Cone Penetration, $\delta z$ (mm)'
+        dlab = 'Fall cone data'
 
-    LL =  fit[1] * 10**(fit[0]*x_)
+    LL =  fit[1] + fit[0]*np.log10(x_)
     PL = plasticLimit(loc_id, tube_num)
 
 
 
-    
-      
-    def plotLLandPL(ax1, ax2): 
-        ax1.plot(x, wc,'ko', label='Test data')
-        ax1.plot(x_, LL, 'r*', label='Liquid Limit')
-        ax1.plot(P, fit[1] * 10**(fit[0]*P), 'b-', lw=2, label='Best-fit Line')
-        ax1.plot([x_, x_, 0], [0, LL, LL], 'k-', lw=1, label='_nolegend')
+    def plotLLandPL(ax1, ax2, LL, PL, x, x_, P, xlab, dlab):
+        ax1.plot(x, wc,'ko', label=dlab, zorder=10, mfc='none', mew=1, ms=4)
+        ax1.plot(x_, LL, 'r*', label='Liquid limit', zorder=20, ms=8, mew=1)
+        ax1.plot(P, fit[1] + fit[0]*np.log10(P), 'b-',
+                 lw=1.5, label='Best-fit line', zorder=5)
+        ax1.plot([x_, x_, 10], [0, LL, LL], 'k-', lw=1,
+                 label='_nolegend', zorder=0, alpha=0.65)
         ax1.set_xscale('log')
+        ax1.set_xlim([10,50])
         ax1.set_xlabel(xlab)
         ax1.set_ylabel(r'Water Content, $w$ (\%)')
         ax1.legend(loc=LegLoc)
-        
+
         #ax1.xaxis.set_major_locator(MultipleLocator(0.1))
         #ax1.xaxis.set_minor_locator(MultipleLocator(0.05))
         ax1.xaxis.grid(True, which='major', ls='-', alpha=0.5)
@@ -380,12 +384,16 @@ def atterbergLimits(loc_id, tube_num, plot=0):
         #ax1.yaxis.set_minor_locator(MultipleLocator(5))
         ax1.yaxis.grid(True, which='major', ls='-', alpha=0.5)
         ax1.yaxis.grid(True, which='minor', ls='-', alpha=0.25)
-              
+
+    if plot == 1:
+        fig = pl.figure()
+        ax1 = fig.add_subplot(1,2,1)
         ax2 = fig.add_subplot(1,2,2)
-        fig.savefig('test.pdf')
+        plotLLandPL(ax1, ax2, LL, PL, x, x_, P, xlab, dlab)
 
-        pl.close(fig)
 
-       
+    fig.savefig('test.pdf')
+    pl.close(fig)
+
     return LL, PL
 
