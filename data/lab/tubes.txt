@@ -1,0 +1,15 @@
+11	1	Gray with reddish brown areas	CL: low plasticity sandy clay	7	9
+11	2	Gray with reddish brown areas	CL: low plasticity sandy clay	10	12
+11	3	Gray with reddish brown areas	SP-SM: poorly graded silty sand	15	16
+11	4	Gray with reddish brown areas	SP: poorly graded sand	16	17
+12	1	Orangish red with brown	SM: silty sand	5	7
+12	2	Orangish red with brown	ML: inorganic silt	20	22
+13	1	Red to dark red	SC: clayey sand	10	12
+13	2	Light gray with dark streaks	CL: silty clay	25	27
+14	1	Dark brown	SP: poorly graded sand	10	11
+14	2	Dark brown	SC: clayey sand	11	12
+14	3	White to brown sand grains	SP: poorly graded sand	15	17
+15	1	Bluish gray	CH: fat clay	10	10.5
+15	2	Bluish, greenish gray	CH: fat clay	10.5	12
+15	3	Bluish gray	CH: fat clay	17	17.5
+15	4	White to yellowish gray	CH: fat clay	17.5	19

@@ -1,0 +1,7 @@
+SET STANDARD_CONFORMING_STRINGS TO ON;
+BEGIN;
+CREATE TABLE "6table" (gid serial PRIMARY KEY,
+"id" int4);
+SELECT AddGeometryColumn('','6table','the_geom','-1','POINT',2);
+INSERT INTO "6table" ("id",the_geom) VALUES ('0','01010000006CCFD27539F6C5C01211230E6C8F3041');
+END;

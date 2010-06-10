@@ -338,7 +338,7 @@ def atterbergLimits(loc_id, tube_num, plot=0):
     '''
     import numpy as np
     import scipy.stats as sps
-    import matplotlib.pyplot as pl
+
 
     wc, x, LL_type = liquidLimit(loc_id, tube_num)
     fit = sps.linregress(np.log10(x), wc)
@@ -363,6 +363,10 @@ def atterbergLimits(loc_id, tube_num, plot=0):
 
 
     def plotLLandPL(ax1, ax2, LL, PL, x, x_, P, xlab, dlab):
+        import matplotlib.pyplot as pl
+        import matplotlib.ticker as mt
+
+        axFmt = mt.FormatStrFormatter('%d')
         ax1.plot(x, wc,'ko', label=dlab, zorder=10, mfc='none', mew=1, ms=4)
         ax1.plot(x_, LL, 'r*', label='Liquid limit', zorder=20, ms=8, mew=1)
         ax1.plot(P, fit[1] + fit[0]*np.log10(P), 'b-',
@@ -373,6 +377,8 @@ def atterbergLimits(loc_id, tube_num, plot=0):
         ax1.set_xlim([10,50])
         ax1.set_xlabel(xlab)
         ax1.set_ylabel(r'Water Content, $w$ (\%)')
+        ax1.xaxis.set_major_formatter(axFmt)
+        ax1.xaxis.set_minor_formatter(axFmt)
         ax1.legend(loc=LegLoc)
 
         #ax1.xaxis.set_major_locator(MultipleLocator(0.1))

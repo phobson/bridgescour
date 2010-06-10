@@ -1,0 +1,44 @@
+SET STANDARD_CONFORMING_STRINGS TO ON;
+BEGIN;
+CREATE TABLE "county_tictable" (gid serial PRIMARY KEY,
+"idtic" int4,
+"xtic" float8,
+"ytic" float8);
+SELECT AddGeometryColumn('','county_tictable','the_geom','-1','POINT',2);
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('1','-2.26265e+005','1.32979e+006','010100000000000040C79E0BC1000000807A4A3441');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('2','-1.35765e+005','1.32788e+006','0101000000000000E0A99200C1000000A008433441');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('3','-4.52498e+004','1.32693e+006','0101000000000000E03A18E6C000000040513F3441');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('4','4.52702e+004','1.32693e+006','0101000000000000C0C51AE640000000C0513F3441');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('5','-2.23321e+005','1.44168e+006','010100000000000080CA420BC1000000E091FF3541');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('6','-1.33999e+005','1.43980e+006','0101000000000000007B5B00C1000000C03AF83541');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('7','-4.46614e+004','1.43886e+006','010100000000000060ABCEE5C00000002090F43541');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('8','4.46807e+004','1.43887e+006','01010000000000008016D1E5400000006092F43541');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('9','-2.29205e+005','1.21800e+006','010100000000000060AAFA0BC100000040D2953241');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('10','-1.37530e+005','1.21607e+006','010100000000000040CFC900C100000000498E3241');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('11','-4.58381e+004','1.21511e+006','010100000000000060C261E6C000000080848A3241');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('12','4.58590e+004','1.21511e+006','0101000000000000405F64E640000000E0858A3241');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('13','1.37549e+005','1.21608e+006','0101000000000000C06BCA0041000000804C8E3241');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('14','-2.32142e+005','1.10636e+006','0101000000000000C072560CC100000020B9E13041');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('15','-1.39292e+005','1.10441e+006','0101000000000000A0DD0001C10000004017DA3041');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('16','-4.64260e+004','1.10343e+006','0101000000000000803EABE6C0000000C046D63041');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('17','4.64465e+004','1.10343e+006','0101000000000000C0D0ADE6400000004049D63041');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('18','1.39312e+005','1.10441e+006','0101000000000000C082010141000000E01ADA3041');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('19','2.32162e+005','1.10637e+006','0101000000000000600C570C4100000020BEE13041');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('20','-2.35074e+005','9.94891e+005','01010000000000004012B20CC100000040955C2E41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('21','-1.41051e+005','9.92912e+005','010100000000000040D63701C100000080204D2E41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('22','-4.70115e+004','9.91924e+005','01010000000000002070F4E6C0000000A068452E41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('23','4.70332e+004','9.91925e+005','01010000000000002027F7E640000000406A452E41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('24','1.41072e+005','9.92917e+005','0101000000000000C083380141000000802A4D2E41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('25','2.35094e+005','9.94898e+005','0101000000000000A0AFB20C4100000040A45C2E41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('26','-2.38001e+005','8.83617e+005','010100000000000080840D0DC10000004042F72A41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('27','-1.42808e+005','8.81614e+005','010100000000000020BD6E01C1000000209CE72A41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('28','-4.75965e+004','8.80613e+005','0101000000000000A0903DE7C000000000C9DF2A41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('29','4.76193e+004','8.80615e+005','0101000000000000A06A40E74000000060CDDF2A41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('30','1.42830e+005','8.81619e+005','0101000000000000006E6F0141000000A0A6E72A41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('31','2.38025e+005','8.83624e+005','010100000000000000460E0D410000002050F72A41');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('32','-1.44559e+005','7.70538e+005','0101000000000000607BA501C100000000D4832741');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('33','-4.81798e+004','7.69525e+005','0101000000000000E07886E7C000000080E97B2741');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('34','4.82053e+004','7.69527e+005','0101000000000000E0A889E74000000080ED7B2741');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('35','1.44584e+005','7.70543e+005','01010000000000008043A6014100000020DD832741');
+INSERT INTO "county_tictable" ("idtic","xtic","ytic",the_geom) VALUES ('36','2.40949e+005','7.72572e+005','0101000000000000C0A7690D41000000C0B7932741');
+END;
