@@ -1,0 +1,18 @@
+Wed 09 Jun 2010 11:59:49 PM PDT 
+-installed postgis via apt-get
+-used shp2pgsql to create *.sql files for included in erosion database
+-in GIS directory:
+    $ ls *.shp > shapefiles.txt
+-the in python:
+    import os
+    f = open('shapefiles.txt', 'r')
+    filenames = filenames.split('\n')[:-1]
+    for f in filenames:
+        pre = f.split('.')[0]
+        cmd = "shp2pgsql %s %stable erosion > %s.sql" % (pre, pre, pre)
+        os.system(cmd)
+-followed instructions found here: http://postgis.refractions.net/docs/ch02.html#id2785969
+to make database: erosion spatially enabled (sql files in /usr/share/postgresql/8.4/contrib)
+-navigated to there i put the output (~/Documents/bridgescour/data/gis/sql) and ran:
+    $ psql -d erosion -h localhost -U paul -f [pgsql_script].sql
+
