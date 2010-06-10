@@ -1,6 +1,9 @@
 Wed 09 Jun 2010 11:59:49 PM PDT 
 -installed postgis via apt-get
--used shp2pgsql to create *.sql files for included in erosion database
+-used shp2pgsql to create *.sql files for included in erosion database (example below)
+    $ shp2pgsql shaperoads roadstable roadsdb > roads.sql
+    $ psql -d roadsdb -f roads.sql
+    $ pgsql2shp -f myfile -p 5555 my_db roads_table
 -in GIS directory:
     $ ls *.shp > shapefiles.txt
 -the in python:
