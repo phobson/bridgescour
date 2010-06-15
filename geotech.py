@@ -301,7 +301,6 @@ def liquidLimit(loc_id, tube_num):
 def plasticLimit(loc_id, tube_num):
     '''PLASTIC LIMIT OF A SOIL SAMPLe
     '''
-
     import numpy as np
 
     cmd = """SELECT sn FROM wcs
@@ -361,36 +360,6 @@ def atterbergLimits(loc_id, tube_num, plot=0):
     PL = plasticLimit(loc_id, tube_num)
 
 
-
-    def plotLLandPL(ax1, ax2, LL, PL, x, x_, P, xlab, dlab):
-        import matplotlib.pyplot as pl
-        import matplotlib.ticker as mt
-
-        axFmt = mt.FormatStrFormatter('%d')
-        ax1.plot(x, wc,'ko', label=dlab, zorder=10, mfc='none', mew=1, ms=4)
-        ax1.plot(x_, LL, 'r*', label='Liquid limit', zorder=20, ms=8, mew=1)
-        ax1.plot(P, fit[1] + fit[0]*np.log10(P), 'b-',
-                 lw=1.5, label='Best-fit line', zorder=5)
-        ax1.plot([x_, x_, 10], [0, LL, LL], 'k-', lw=1,
-                 label='_nolegend', zorder=0, alpha=0.65)
-        ax1.set_xscale('log')
-        ax1.set_xlim([10,50])
-        ax1.set_xlabel(xlab)
-        ax1.set_ylabel(r'Water Content, $w$ (\%)')
-        ax1.xaxis.set_major_formatter(axFmt)
-        ax1.xaxis.set_minor_formatter(axFmt)
-        ax1.legend(loc=LegLoc)
-
-        #ax1.xaxis.set_major_locator(MultipleLocator(0.1))
-        #ax1.xaxis.set_minor_locator(MultipleLocator(0.05))
-        ax1.xaxis.grid(True, which='major', ls='-', alpha=0.5)
-        ax1.xaxis.grid(True, which='minor', ls='-', alpha=0.25)
-
-        #ax1.yaxis.set_major_locator(MultipleLocator(10))
-        #ax1.yaxis.set_minor_locator(MultipleLocator(5))
-        ax1.yaxis.grid(True, which='major', ls='-', alpha=0.5)
-        ax1.yaxis.grid(True, which='minor', ls='-', alpha=0.25)
-
     if plot == 1:
         fig = pl.figure()
         ax1 = fig.add_subplot(1,2,1)
@@ -402,4 +371,62 @@ def atterbergLimits(loc_id, tube_num, plot=0):
     pl.close(fig)
 
     return LL, PL
+
+
+def plotLLandPL(ax1, ax2, LL, PL, x, x_, P, xlab, dlab):
+    import matplotlib.pyplot as pl
+    import matplotlib.ticker as mt
+
+    axFmt = mt.FormatStrFormatter('%d')
+    ax1.plot(x, wc,'ko', label=dlab, zorder=10, mfc='none', mew=1, ms=4)
+    ax1.plot(x_, LL, 'r*', label='Liquid limit', zorder=20, ms=8, mew=1)
+    ax1.plot(P, fit[1] + fit[0]*np.log10(P), 'b-',
+             lw=1.5, label='Best-fit line', zorder=5)
+    ax1.plot([x_, x_, 10], [0, LL, LL], 'k-', lw=1,
+             label='_nolegend', zorder=0, alpha=0.65)
+    ax1.set_xscale('log')
+    ax1.set_xlim([10,50])
+    ax1.set_xlabel(xlab)
+    ax1.set_ylabel(r'Water Content, $w$ (\%)')
+    ax1.xaxis.set_major_formatter(axFmt)
+    ax1.xaxis.set_minor_formatter(axFmt)
+    ax1.legend(loc=LegLoc)
+
+    #ax1.xaxis.set_major_locator(MultipleLocator(0.1))
+    #ax1.xaxis.set_minor_locator(MultipleLocator(0.05))
+    ax1.xaxis.grid(True, which='major', ls='-', alpha=0.5)
+    ax1.xaxis.grid(True, which='minor', ls='-', alpha=0.25)
+
+    #ax1.yaxis.set_major_locator(MultipleLocator(10))
+    #ax1.yaxis.set_minor_locator(MultipleLocator(5))
+    ax1.yaxis.grid(True, which='major', ls='-', alpha=0.5)
+    ax1.yaxis.grid(True, which='minor', ls='-', alpha=0.25)
+
+def plasticityChart():
+    '''Plots standard plasticity chart'''
+    import numpy as np
+    import matplotlib.pyplot as pl
+
+    # x-axis and standard lines
+    wLL = np.arange(141)
+    aLine = 0.73 * (wLL - 20)
+    uLine = 0.90 * (wLL - 8)
+
+    # hatched area
+    hx = np.array([28,10,10,24])
+    hy = aLine[[28,28,24,24]]
+
+    fig = pl.figure()
+    ax = fig.add_subplot(111)
+    ax.fill(hx, hy, facecolor='0.75', edgecolor='0.75')
+    ax.plot(wLL, aLine, 'k-', label='A-Line')
+    ax.plot(wLL, uLine, 'b-', label='U-line')
+    ax.legend(loc='lower right')
+    ax.set_xlim([0, 140])
+    ax.set_ylim([0, 60])
+    ax.set_xlabel(r'Liquid Limit, $w_{LL}$')
+    ax.set_ylabel(r'Plasticity Index, $I_p$')
+
+    fig.savefig('plast_chart.pdf')
+
 
