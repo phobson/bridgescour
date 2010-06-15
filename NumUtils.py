@@ -25,99 +25,25 @@ def bootstrapMedian(data, N=5000):
 
 #---------------------------------------------
 def linInterp(X,Y,x):
-    '''        NOT YET TESTED
-    Old MATLAB Code:
-    % LINEARLY INTERPOLATE FROM A 2D DATASET
-    %   This function linearly interpolates bewteen two values in a dataset
-    %
-    %   Inputs:
-    %       x_val  = the value from which y_val will be interpolated
-    %       x_data = x-values of data set
-    %       y_data = y-values of data set
-    %
-    %   Outputs:
-    %       y_val  = the linearly interpolated value
-    %
-    %   Other functions called:
-    %       NONE
-    %
-    %   Example:
-    %       >> SG = (2.95:-0.05:2.45)';
-    %       >> a = (0.94:0.01:1.04)';
-    %       >> a_ = linInterp(2.682, SG, a);
-    %
-    %   See also planeInterp.
-    
-    if x_val < min(x_data)
-        Sl = (y_data(2) - y_data(1)) / (x_data(2) - x_data(1));
-        y_val = y_data(1) - (x_data(1) - x_val)*Sl;
-
-    elseif x_val > max(x_data)
-        Sl = (y_data(end) - y_data(end-1)) / (x_data(end) - x_data(end-1));
-        y_val = y_data(end) + (x_val - x_data(end))*Sl;
-
-    else
-        for n = 1:length(x_data)-1
-            if x_val >= x_data(n) && x_val <= x_data(n+1)
-                m = n;
-            end
-        end
-    y_val = (y_data(m)-y_data(m + 1)) * (x_val-x_data(m)) / (x_data(m)-...
-        x_data(m + 1))+y_data(m);
-
-    end
+    '''DEPRECATED - CALL scipy.interpolate.interp1d instead
     '''
-    if x < min(X): # this checks
-        S = (Y[1] - Y[0])/(X[1] - X[0])
-        y = Y[0] - (X[0] - x)*S
-        
-    elif x > max(X): # this checks
-        S = (Y[-1] - Y[-2])/(X[-1] - X[-2])
-        y = Y[-1] + (x - X[-1])*S
-        
-    else: # needs to be checked
-        for i in range(len(X)-1):
-            if x >= X[i] and x <= X[i+1]:
-                m = i
-        y = (Y[m] - Y[m+1]) * (x - X[m]) / (X[m]-X[m+1]) + Y[m]
+    from scipy.interpolate import interp1d
+    
+    LI = interp1d(X,Y)
+    y = LI(x)
     return y
+    
    
 #---------------------------------------------   
 def planeInterp(X,Y,Z,x,y):
-    '''         NOT YET TESTED
-    X, Y, and Z need to be arrays, not list!
-    
+    '''DEPRECATED - CALL scipy.interpolate.interp2d instead
     '''
-
+    from scipy.interpolate import interp2d
     
-    # determine x-indicies
-    if x > max(X):
-        nx = [len(X)-1, len(X)]
-    
-    elif x < min(X):
-        nx = [0, 1]
-        
-    else:
-        nx = [find(X<x)[-1], find(X>x)[0]]
-
-    # determine y-indicies
-    if y > max(Y):
-        ny = [len(Y)-1, len(Y)]
-    
-    elif y < min(Y):
-        ny = [0, 1]
-        
-    else:
-        ny = [find(Y<y)[-1], find(Y>y)[0]]
-       
-    # use all those indices        
-    Z_ = Z[ny[0]:ny[1]+1, nx[0]:nx[1]+1]
-    X_ = X[nx[0]:nx[1]+1]
-    Y_ = Y[ny[0]:ny[1]+1]
-    
-    zt = [linInterp(Y, Z_[:,0], y), linInterp(Y, Z_[:,1], y)]
-    z = linInterp(X, zt, z)
+    PI = interp1d(X,Y,Z)
+    z = PI(x,y)
     return z
+
     
 #--------------------------------------------- 
 def smoothData(x, d):
@@ -138,7 +64,7 @@ def smoothData(x, d):
 
 #---------------------------------------------
 def savitsky_golay(data, kernel=11, order=4):
-    """
+    '''
         applies a Savitzky-Golay filter
         input parameters:
         - data => data as a 1D numpy array
@@ -148,7 +74,7 @@ def savitsky_golay(data, kernel=11, order=4):
             
         invoke like:
         smoothed = savitzky_golay(<rough>, [kernel = value], [order = value] )
-    """
+    '''
     import numpy as np
     try:
         kernel = abs(int(kernel))
