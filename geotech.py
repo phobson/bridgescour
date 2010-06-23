@@ -337,7 +337,7 @@ def atterbergLimits(loc_id, tube_num, plot=0):
     '''
     import numpy as np
     import scipy.stats as sps
-
+    import matplotlib.pyplot as pl
 
     wc, x, LL_type = liquidLimit(loc_id, tube_num)
     fit = sps.linregress(np.log10(x), wc)
@@ -359,30 +359,42 @@ def atterbergLimits(loc_id, tube_num, plot=0):
     LL =  fit[1] + fit[0]*np.log10(x_)
     PL = plasticLimit(loc_id, tube_num)
 
+    if plot > 0:
+        if plot == 1:
+            fig = pl.figure()
+            ax1 = fig.add_subplot(111)
+            plotLLandPL(ax1, LegLoc, wc, fit, LL, PL, x, x_, P, xlab, dlab)
+            fig.savefig('LiquidLimit_%d-%d.pdf' % (loc_id, tube_num))
+            
+        if plot == 2:
+            fig = pl.figure(figsize=(5,3.5))
+            ax1 = fig.add_subplot(111)
+            plasticityChart(ax1, [LL*100], [PL*100], [loc_id], [tube_num])
+            fig.savefig('PlasticityChart_%d-%d.pdf' % (loc_id, tube_num))
 
-    if plot == 1:
-        fig = pl.figure()
-        ax1 = fig.add_subplot(1,2,1)
-        ax2 = fig.add_subplot(1,2,2)
-        plotLLandPL(ax1, ax2, LL, PL, x, x_, P, xlab, dlab)
-
-
-    fig.savefig('test.pdf')
+        if plot == 3:
+            fig = pl.figure(figsize=(5,5))
+            ax1 = fig.add_axes([0.12,0.71,0.85,0.27])
+            ax2 = fig.add_axes([0.12,0.09,0.85,0.51])
+            plotLL(ax1, LegLoc, wc, fit, LL, PL, x, x_, P, xlab, dlab)
+            plasticityChart(ax2, [LL*100], [PL*100], [loc_id], [tube_num])
+            fig.savefig('Atterbergs%d-%d.pdf' % (loc_id, tube_num))
+            
     pl.close(fig)
 
     return LL, PL
 
 
-def plotLLandPL(ax1, ax2, LL, PL, x, x_, P, xlab, dlab):
-    import matplotlib.pyplot as pl
+def plotLL(ax1, LegLoc, wc, fit, LL, PL, x, x_, P, xlab, dlab):
     import matplotlib.ticker as mt
+    import numpy as np
 
     axFmt = mt.FormatStrFormatter('%d')
     ax1.plot(x, wc,'ko', label=dlab, zorder=10, mfc='none', mew=1, ms=4)
     ax1.plot(x_, LL, 'r*', label='Liquid limit', zorder=20, ms=8, mew=1)
     ax1.plot(P, fit[1] + fit[0]*np.log10(P), 'b-',
-             lw=1.5, label='Best-fit line', zorder=5)
-    ax1.plot([x_, x_, 10], [0, LL, LL], 'k-', lw=1,
+             lw=1.25, label='Best-fit line', zorder=5)
+    ax1.plot([x_, x_, 10], [0, LL, LL], 'k-', lw=0.75,
              label='_nolegend', zorder=0, alpha=0.65)
     ax1.set_xscale('log')
     ax1.set_xlim([10,50])
@@ -392,17 +404,12 @@ def plotLLandPL(ax1, ax2, LL, PL, x, x_, P, xlab, dlab):
     ax1.xaxis.set_minor_formatter(axFmt)
     ax1.legend(loc=LegLoc)
 
-    #ax1.xaxis.set_major_locator(MultipleLocator(0.1))
-    #ax1.xaxis.set_minor_locator(MultipleLocator(0.05))
-    ax1.xaxis.grid(True, which='major', ls='-', alpha=0.5)
-    ax1.xaxis.grid(True, which='minor', ls='-', alpha=0.25)
+    #ax1.xaxis.grid(True, which='major', ls='-', alpha=0.5)
+    #ax1.xaxis.grid(True, which='minor', ls='-', alpha=0.25)
+    #ax1.yaxis.grid(True, which='major', ls='-', alpha=0.5)
+    #ax1.yaxis.grid(True, which='minor', ls='-', alpha=0.25)
 
-    #ax1.yaxis.set_major_locator(MultipleLocator(10))
-    #ax1.yaxis.set_minor_locator(MultipleLocator(5))
-    ax1.yaxis.grid(True, which='major', ls='-', alpha=0.5)
-    ax1.yaxis.grid(True, which='minor', ls='-', alpha=0.25)
-
-def plasticityChart():
+def plasticityChart(ax, LL, PL, loc_id, tube_num):
     '''Plots standard plasticity chart'''
     import numpy as np
     import matplotlib.pyplot as pl
@@ -416,17 +423,31 @@ def plasticityChart():
     hx = np.array([28,10,10,24])
     hy = aLine[[28,28,24,24]]
 
-    fig = pl.figure()
-    ax = fig.add_subplot(111)
     ax.fill(hx, hy, facecolor='0.75', edgecolor='0.75')
     ax.plot(wLL, aLine, 'k-', label='A-Line')
     ax.plot(wLL, uLine, 'b-', label='U-line')
+    for ll, pl, loc, tube in zip(LL, PL, loc_id, tube_num):
+        ax.plot(ll, ll-pl, 'ko', ms=4)
+        ax.annotate('%d-%d' % (loc, tube), xy=(ll, ll-pl),
+                    xycoords='data', xytext=(2.5,2.5),
+                    textcoords='offset points')
+    ax.text(69, 22, 'OH')
+    ax.text(69, 13, 'MH')
+    ax.text(59, 35, 'CH')
+    ax.text(36, 17, 'CL')
+    ax.text(36,  6, 'ML \& OL')
+    ax.text(12, 0.25, 'ML')
+    ax.text(57.5, uLine[61], 'U-Line', rotation=0.95*180/3.1415, color='b')
+    ax.text(80.5, aLine[84], 'A-Line', rotation=0.83*180/3.1415, color='k')
+    ax.annotate('CL - ML', xy=(10,aLine[28]), xycoords='data',
+                xytext=(-15,30), textcoords='offset points',
+                arrowprops=dict(arrowstyle='->',
+                                connectionstyle='arc3,rad=0.3'))
+
     ax.legend(loc='lower right')
     ax.set_xlim([0, 140])
     ax.set_ylim([0, 60])
     ax.set_xlabel(r'Liquid Limit, $w_{LL}$')
     ax.set_ylabel(r'Plasticity Index, $I_p$')
-
-    fig.savefig('plast_chart.pdf')
 
 
