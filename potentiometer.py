@@ -1,6 +1,8 @@
 '''POTENTIOMETER.PY
 Collection of function to process, use, and plot potentiometer data.
 Planeed functions/routines:
+    -getExtrusionData
+    =getErosionData
     -extrusionLength
     -erosionRate
 '''
@@ -98,37 +100,57 @@ def extrusionLength(loc_id, tube_num, sn):
     return h
 
 
+def __test_getAllData(table):
+    cmd = """
+    SELECT DISTINCT loc_id, tube_num, sn
+    FROM %s""" % table
+    cnn, cur = connectToDB(cmd)
+    loc_id = []
+    tube_num = []
+    sn = []
+    for c in cur:
+        loc_id.append(c[0])
+        tube_num.append(c[1])
+        sn.append(c[2])
+
+    return loc_id, tube_num, sn
+
 def __test_getPotData():
-    loc_id = 11
-    tube_num = 1
-    sn = 1
-    t1, d1 = getPotData(loc_id, tube_num, sn, 'extrusion')
-    t2, d2 = getPotData(loc_id, tube_num, sn, 'erosion')
+    Tables = ['erosion', 'luerosion', 'extrusion', 'luextrusion']
+    for table in Tables:
+        loc_id, tube_num, sam_num = __test_getAllData(table)
+        for lid, tnum, snum in zip(loc_id, tube_num, sam_num):
+            t,d = getPotData(lid, tnum, snum, 'extrusion')
 
 def __test_getExtrusionData():
-    loc_id = 11
-    tube_num = 1
-    sn = 1
-    t, d, info = getExtrusionData(loc_id, tube_num, sn)
+    Tables = ['extrusion', 'luextrusion']
+    for table in Tables:
+        loc_id, tube_num, sam_num = __test_getAllData(table)
+        for lid, tnum, snum in zip(loc_id, tube_num, sam_num):
+            t, d, info = getExtrusionData(lid, tnum, snum)
 
 def __test_getErosionData():
-    loc_id = 11
-    tube_num = 1
-    sn = 1
-    t, d, info = getErosionData(loc_id, tube_num, sn)
+    Tables = ['erosion', 'luerosion']
+    for table in Tables:
+        loc_id, tube_num, sam_num = __test_getAllData(table)
+        for lid, tnum, snum in zip(loc_id, tube_num, sam_num):
+            t, d, info = getErosionData(lid, tnum, snum)
+
 
 def __test_extrusionLength():
-    loc_id = 11
-    tube_num = 1
-    sn = 1
-    h = extrusionLength(loc_id, tube_num, sn)
-    print(h)
+    h = []
+    Tables = ['extrusion', 'luextrusion']
+    for table in Tables:
+        loc_id, tube_num, sam_num = __test_getAllData(table)
+        for lid, tnum, snum in zip(loc_id, tube_num, sam_num):
+            h.append(extrusionLength(lid, tnum, snum))
+    return h
 
 def __test_potentiometer():
     __test_getPotData()
     __test_getExtrusionData()
     __test_getErosionData()
-    __test_extrusionLength()
+    h = __test_extrusionLength()
 
 
 
