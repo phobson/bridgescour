@@ -6,11 +6,13 @@ School of Civil and Environmental Engineering and the stress-controlled
 rheometer in the Complex Fluids Laboratory.
 
 Available functions intended to be call individually include:
-waterConent(loc_id, tube_num, sn)
-specificGravity(loc_id, tube_num)
-organicMatterContent(loc_id. tube_num)
-grainSize(loc_id, tube_num)
-atterbergLimits(loc_id, tube_num)
+    -waterConent(loc_id, tube_num, sn)
+    -specificGravity(loc_id, tube_num)
+    -organicMatterContent(loc_id. tube_num)
+    -grainSize(loc_id, tube_num)
+    -liquidLimit(loc_id, tube_num)
+    -plasticLimit(loc_id, tube_num)
+    -atterbergLimits(loc_id, tube_num)
 
 See individual docstrings for help.
 -Paul M. Hobson
@@ -19,37 +21,7 @@ See individual docstrings for help.
 '''
 
 from __future__ import division
-
-def connectToDB(cmd=None):
-    '''Connect to Erosiondatabase
-    General function to connect to erosion database
-
-    Inputs: NONE
-    Outputs: cnn (pyscopg2 connection object)
-    Usage:
-        import geotech
-        cnn = geotech.connectToDB()
-    '''
-    import psycopg2 as db
-    f = open('puppies', 'r')
-    puppies = f.readline()
-    cnn = db.connect(host='localhost', user='paul', 
-                     password=puppies, database='erosion')
-    cur = cnn.cursor()
-    if cmd:
-        cur.execute(cmd)
-
-    return cnn, cur
-
-def getCalibFactors(calib_type):
-    cmd = """SELECT * FROM calib
-             WHERE calib_type = %d""" % (calib_type)
-    cnn, cur = connectToDB(cmd)
-    CF = cur.fetchone()[1:]
-    return CF
-    cnn.close()
-
-
+from MiscUtils import connectToDB, getCalibFactors
 
 def waterContent(loc_id, tube_num, sn):
     '''WATER CONTENT OF A SOIL SAMPLE
@@ -73,7 +45,7 @@ def waterContent(loc_id, tube_num, sn):
     Mw = Mpsw - Mps
     Ms = Mps - Mp
     wc = Mw/Ms
-
+    cur.close()
     cnn.close()
     return wc
 
@@ -102,6 +74,7 @@ def specificGravity(loc_id, tube_num):
     Ms = Mps - Mp
 
     sg = Ms / (Ms - M1 + M2)
+    cur.close()
     cnn.close()
     return sg
 
@@ -116,6 +89,7 @@ def organicMatterConent(loc_id, tube_num):
     Ms = Mps - Ms
     om = Ma/Ms
 
+    cur.close()
     cnn.close()
     return om
 
@@ -272,7 +246,8 @@ def grainSize(loc_id, tube_num, plot=False):
         fig.savefig('%s%d.pdf' % (tubeInfo[0], tube_num),
                     dpi=300, bbox_inches='tight')
         pl.close(fig)
-
+    
+    cur.close()
     cnn.close()
     return D, PF, Label
 
@@ -295,6 +270,7 @@ def liquidLimit(loc_id, tube_num):
         x = np.hstack([x, row[1]])
         LL_type = row[2]
 
+    cur.close()
     cnn.close()
     return wc, x, LL_type
 
@@ -314,6 +290,7 @@ def plasticLimit(loc_id, tube_num):
 
     PL = wc.mean()
 
+    cur.close()
     cnn.close()
     return PL
 
@@ -403,11 +380,6 @@ def plotLL(ax1, LegLoc, wc, fit, LL, PL, x, x_, P, xlab, dlab):
     ax1.xaxis.set_major_formatter(axFmt)
     ax1.xaxis.set_minor_formatter(axFmt)
     ax1.legend(loc=LegLoc)
-
-    #ax1.xaxis.grid(True, which='major', ls='-', alpha=0.5)
-    #ax1.xaxis.grid(True, which='minor', ls='-', alpha=0.25)
-    #ax1.yaxis.grid(True, which='major', ls='-', alpha=0.5)
-    #ax1.yaxis.grid(True, which='minor', ls='-', alpha=0.25)
 
 def plasticityChart(ax, LL, PL, loc_id, tube_num):
     '''Plots standard plasticity chart'''
