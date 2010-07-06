@@ -2,7 +2,7 @@
 Collection of function to process, use, and plot potentiometer data.
 Planeed functions/routines:
     -getExtrusionData
-    =getErosionData
+    -getErosionData
     -extrusionLength
     -erosionRate
 '''
@@ -100,18 +100,20 @@ def extrusionLength(loc_id, tube_num, sn):
     return h
 
 
-def __test_getAllData(table):
-    cmd = """
-    SELECT DISTINCT loc_id, tube_num, sn
-    FROM %s""" % table
-    cnn, cur = connectToDB(cmd)
-    loc_id = []
-    tube_num = []
-    sn = []
-    for c in cur:
-        loc_id.append(c[0])
-        tube_num.append(c[1])
-        sn.append(c[2])
+def __test_getAllData():
+    Tables = ['erosion', 'luerosion', 'extrusion', 'luextrusion']
+    for table in Tables:
+        cmd = """
+        SELECT DISTINCT loc_id, tube_num, sn
+        FROM %s""" % table
+        cnn, cur = connectToDB(cmd)
+        loc_id = []
+        tube_num = []
+        sn = []
+        for c in cur:
+            loc_id.append(c[0])
+            tube_num.append(c[1])
+            sn.append(c[2])
 
     return loc_id, tube_num, sn
 
@@ -147,15 +149,16 @@ def __test_extrusionLength():
     return h
 
 def __test_potentiometer():
+    __test_getAllData():
     __test_getPotData()
     __test_getExtrusionData()
     __test_getErosionData()
     h = __test_extrusionLength()
+    return h
 
 
 
 if 1:
-    __test_potentiometer()
-
+    h=__test_potentiometer()
 
 

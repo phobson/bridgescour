@@ -11,5 +11,5 @@ COPY luextrusion TO '/home/paul/Documents/database/luextrusion.txt' WITH DELIMIT
 COPY extrusion TO '/home/paul/Documents/database/extrusion.txt' WITH DELIMITER AS E'\t';
 COPY luerosion TO '/home/paul/Documents/database/luerosion.txt' WITH DELIMITER AS E'\t';
 COPY erosion TO '/home/paul/Documents/database/erosion.txt' WITH DELIMITER AS E'\t';
-COPY luysd TO '/home/paul/Documents/database/luysd.txt' WITH DELIMITER AS E'\t';
-COPY ysd TO '/home/paul/Documents/database/ysd.txt' WITH DELIMITER AS E'\t';
+COPY yieldstress_info TO '/home/paul/Documents/database/yieldstress_info.txt' WITH DELIMITER AS E'\t';
+COPY yieldstress TO '/home/paul/Documents/database/yieldstress.txt' WITH DELIMITER AS E'\t';

@@ -83,8 +83,8 @@ WITH (
 ALTER TABLE hydrometer OWNER TO paul;
 
 
---luerosion
-CREATE TABLE luerosion
+--erosion_info
+CREATE TABLE erosion_info
 (
   loc_id integer NOT NULL,
   tube_num integer NOT NULL,
@@ -96,16 +96,16 @@ CREATE TABLE luerosion
   note character varying(100),
   wcs_sn integer,
   ext_sn integer,
-  CONSTRAINT luerosion_pkey PRIMARY KEY (loc_id, tube_num, sn)
+  CONSTRAINT erosion_info_pkey PRIMARY KEY (loc_id, tube_num, sn)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE luerosion OWNER TO paul;
+ALTER TABLE erosion_info OWNER TO paul;
 
 
---luextrusion
-CREATE TABLE luextrusion
+--extrusion_info
+CREATE TABLE extrusion_info
 (
   loc_id integer NOT NULL,
   tube_num integer NOT NULL,
@@ -118,32 +118,32 @@ CREATE TABLE luextrusion
   msw double precision,
   note character varying(100),
   wcs_sn integer,
-  CONSTRAINT luextrusion_pkey PRIMARY KEY (loc_id, tube_num, sn)
+  CONSTRAINT extrusion_info_pkey PRIMARY KEY (loc_id, tube_num, sn)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE luextrusion OWNER TO paul;
+ALTER TABLE extrusion_info OWNER TO paul;
 
 
---luhydrometer
-CREATE TABLE luhydrometer
+--hydrometer_info
+CREATE TABLE hydrometer_info
 (
   loc_id integer NOT NULL,
   tube_num integer NOT NULL,
   mps double precision,
   note character varying(75),
   wcs_sn integer,
-  CONSTRAINT luhydrometer_pkey PRIMARY KEY (loc_id, tube_num)
+  CONSTRAINT hydrometer_info_pkey PRIMARY KEY (loc_id, tube_num)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE luhydrometer OWNER TO paul;
+ALTER TABLE hydrometer_info OWNER TO paul;
 
 
---luysd
-CREATE TABLE luysd
+--yieldstress_info
+CREATE TABLE yieldstress_info
 (
   loc_id integer NOT NULL,
   tube_num integer NOT NULL,
@@ -171,12 +171,12 @@ CREATE TABLE luysd
   x22 double precision,
   y21 double precision,
   y22 double precision,
-  CONSTRAINT luysd_pkey PRIMARY KEY (loc_id, tube_num, sn)
+  CONSTRAINT yieldstress_info_pkey PRIMARY KEY (loc_id, tube_num, sn)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE luysd OWNER TO paul;
+ALTER TABLE yieldstress_info OWNER TO paul;
 
 
 --omd
@@ -283,7 +283,7 @@ WITH (
 );
 ALTER TABLE wcs OWNER TO paul;
 
-CREATE TABLE ysd
+CREATE TABLE yieldstress
 (
   loc_id integer NOT NULL,
   tube_num integer NOT NULL,
@@ -293,12 +293,12 @@ CREATE TABLE ysd
   tau double precision,
   eta double precision,
   gmd double precision,
-  CONSTRAINT ysd_pkey PRIMARY KEY (loc_id, tube_num, sn, rn)
+  CONSTRAINT yieldstress_pkey PRIMARY KEY (loc_id, tube_num, sn, rn)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE ysd OWNER TO paul;
+ALTER TABLE yieldstress OWNER TO paul;
 
 COPY codes FROM '/home/paul/Documents/bridgescour/data/codes.txt' WITH DELIMITER AS E'\t';
 COPY calib FROM '/home/paul/Documents/bridgescour/data/calib.txt' WITH DELIMITER AS E'\t';
@@ -309,12 +309,13 @@ COPY omd FROM '/home/paul/Documents/bridgescour/data/omd.txt' WITH DELIMITER AS 
 COPY locations FROM '/home/paul/Documents/bridgescour/data/locations.txt' WITH DELIMITER AS E'\t';
 COPY sgd FROM '/home/paul/Documents/bridgescour/data/sgd.txt' WITH DELIMITER AS E'\t';
 COPY hydrometer FROM '/home/paul/Documents/bridgescour/data/hydrometer.txt' WITH DELIMITER AS E'\t';
-COPY luextrusion FROM '/home/paul/Documents/bridgescour/data/luextrusion.txt' WITH DELIMITER AS E'\t';
+COPY hydrometer_info FROM '/home/paul/Documents/bridgescour/data/hydrometer_info.txt' WITH DELIMITER AS E'\t';
+COPY extrusion_info FROM '/home/paul/Documents/bridgescour/data/extrusion_info.txt' WITH DELIMITER AS E'\t';
 COPY extrusion FROM '/home/paul/Documents/bridgescour/data/extrusion.txt' WITH DELIMITER AS E'\t';
-COPY luerosion FROM '/home/paul/Documents/bridgescour/data/luerosion.txt' WITH DELIMITER AS E'\t';
+COPY erosion_info FROM '/home/paul/Documents/bridgescour/data/erosion_info.txt' WITH DELIMITER AS E'\t';
 COPY erosion FROM '/home/paul/Documents/bridgescour/data/erosion.txt' WITH DELIMITER AS E'\t';
-COPY luysd FROM '/home/paul/Documents/bridgescour/data/luysd.txt' WITH DELIMITER AS E'\t';
-COPY ysd FROM '/home/paul/Documents/bridgescour/data/ysd.txt' WITH DELIMITER AS E'\t';
+COPY yieldstress_info FROM '/home/paul/Documents/bridgescour/data/yieldstress_info.txt' WITH DELIMITER AS E'\t';
+COPY yieldstress FROM '/home/paul/Documents/bridgescour/data/yieldstress.txt' WITH DELIMITER AS E'\t';
 
 
 
@@ -327,61 +328,61 @@ ALTER TABLE calib
       
 ALTER TABLE erosion
   ADD CONSTRAINT erosion_lookup FOREIGN KEY (loc_id, tube_num, sn)
-      REFERENCES luerosion (loc_id, tube_num, sn) MATCH SIMPLE
+      REFERENCES erosion_info (loc_id, tube_num, sn) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
 ALTER TABLE extrusion
   ADD CONSTRAINT extrusion_lookup FOREIGN KEY (loc_id, tube_num, sn)
-      REFERENCES luextrusion (loc_id, tube_num, sn) MATCH SIMPLE
+      REFERENCES extrusion_info (loc_id, tube_num, sn) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
 ALTER TABLE hydrometer
   ADD CONSTRAINT hydrometer_lookup FOREIGN KEY (loc_id, tube_num)
-      REFERENCES luhydrometer (loc_id, tube_num) MATCH SIMPLE
+      REFERENCES hydrometer_info (loc_id, tube_num) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE luerosion
-  ADD CONSTRAINT luerosion_erosion_type FOREIGN KEY (erosion_type)
+ALTER TABLE erosion_info
+  ADD CONSTRAINT erosion_info_erosion_type FOREIGN KEY (erosion_type)
       REFERENCES codes (code) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE luerosion
-  ADD CONSTRAINT luerosion_to_tubes FOREIGN KEY (loc_id, tube_num)
+ALTER TABLE erosion_info
+  ADD CONSTRAINT erosion_info_to_tubes FOREIGN KEY (loc_id, tube_num)
       REFERENCES tubes (loc_id, num) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE luerosion
-  ADD CONSTRAINT luerosion_to_wcs FOREIGN KEY (loc_id, tube_num, wcs_sn)
+ALTER TABLE erosion_info
+  ADD CONSTRAINT erosion_info_to_wcs FOREIGN KEY (loc_id, tube_num, wcs_sn)
       REFERENCES wcs (loc_id, tube_num, sn) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE luerosion
-  ADD CONSTRAINT luerosion_to_luextrusion FOREIGN KEY (loc_id, tube_num, ext_sn)
-      REFERENCES luextrusion (loc_id, tube_num, sn) MATCH SIMPLE
+ALTER TABLE erosion_info
+  ADD CONSTRAINT erosion_info_to_extrusion_info FOREIGN KEY (loc_id, tube_num, ext_sn)
+      REFERENCES extrusion_info (loc_id, tube_num, sn) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE luextrusion
-  ADD CONSTRAINT luextrusion_to_tubes FOREIGN KEY (loc_id, tube_num)
+ALTER TABLE extrusion_info
+  ADD CONSTRAINT extrusion_info_to_tubes FOREIGN KEY (loc_id, tube_num)
       REFERENCES tubes (loc_id, num) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE luextrusion
-  ADD CONSTRAINT luextrusion_to_wcs FOREIGN KEY (loc_id, tube_num, wcs_sn)
+ALTER TABLE extrusion_info
+  ADD CONSTRAINT extrusion_info_to_wcs FOREIGN KEY (loc_id, tube_num, wcs_sn)
       REFERENCES wcs (loc_id, tube_num, sn) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE luhydrometer
-  ADD CONSTRAINT luhydrometer_to_tubes FOREIGN KEY (loc_id, tube_num)
+ALTER TABLE hydrometer_info
+  ADD CONSTRAINT hydrometer_info_to_tubes FOREIGN KEY (loc_id, tube_num)
       REFERENCES tubes (loc_id, num) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE luhydrometer
-  ADD CONSTRAINT luhydrometer_to_wcs FOREIGN KEY (loc_id, tube_num, wcs_sn)
+ALTER TABLE hydrometer_info
+  ADD CONSTRAINT hydrometer_info_to_wcs FOREIGN KEY (loc_id, tube_num, wcs_sn)
       REFERENCES wcs (loc_id, tube_num, sn) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE luysd
-  ADD CONSTRAINT luysd_to_tubes FOREIGN KEY (loc_id, tube_num)
+ALTER TABLE yieldstress_info
+  ADD CONSTRAINT yieldstress_info_to_tubes FOREIGN KEY (loc_id, tube_num)
       REFERENCES tubes (loc_id, num) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
@@ -410,9 +411,9 @@ ALTER TABLE wcs
       REFERENCES codes (code) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE ysd
+ALTER TABLE yieldstress
   ADD CONSTRAINT ysd_lookup FOREIGN KEY (loc_id, tube_num, sn)
-      REFERENCES luysd (loc_id, tube_num, sn) MATCH SIMPLE
+      REFERENCES yieldstress_info (loc_id, tube_num, sn) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
 ALTER TABLE tubes
