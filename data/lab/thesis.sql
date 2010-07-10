@@ -1,10 +1,10 @@
 -- DATABASE
-CREATE DATABASE erosion
-  WITH OWNER = paul
-       ENCODING = 'UTF8'
-       LC_COLLATE = 'en_US.UTF-8'
-       LC_CTYPE = 'en_US.UTF-8'
-       CONNECTION LIMIT = -1;
+--CREATE DATABASE erosion
+--  WITH OWNER = paul
+--       ENCODING = 'UTF8'
+--       LC_COLLATE = 'en_US.UTF-8'
+--       LC_CTYPE = 'en_US.UTF-8'
+--       CONNECTION LIMIT = -1;
        
 --TABLES
 --calibration table
@@ -94,7 +94,7 @@ CREATE TABLE erosion_info
   dur double precision,
   erosion_type integer,
   note character varying(100),
-  wcs_sn integer,
+  wc_sn integer,
   ext_sn integer,
   CONSTRAINT erosion_info_pkey PRIMARY KEY (loc_id, tube_num, sn)
 )
@@ -117,7 +117,7 @@ CREATE TABLE extrusion_info
   mms double precision,
   msw double precision,
   note character varying(100),
-  wcs_sn integer,
+  wc_sn integer,
   CONSTRAINT extrusion_info_pkey PRIMARY KEY (loc_id, tube_num, sn)
 )
 WITH (
@@ -133,7 +133,7 @@ CREATE TABLE hydrometer_info
   tube_num integer NOT NULL,
   mps double precision,
   note character varying(75),
-  wcs_sn integer,
+  wc_sn integer,
   CONSTRAINT hydrometer_info_pkey PRIMARY KEY (loc_id, tube_num)
 )
 WITH (
@@ -179,20 +179,20 @@ WITH (
 ALTER TABLE yieldstress_info OWNER TO paul;
 
 
---omd
-CREATE TABLE omd
+--organicmatter
+CREATE TABLE organicmatter
 (
   loc_id integer NOT NULL,
   tube_num integer NOT NULL,
   mp double precision,
   mpsa double precision,
   mps double precision,
-  CONSTRAINT omd_pkey PRIMARY KEY (loc_id, tube_num)
+  CONSTRAINT organicmatter_pkey PRIMARY KEY (loc_id, tube_num)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE omd OWNER TO paul;
+ALTER TABLE organicmatter OWNER TO paul;
 
 
 --locations
@@ -213,8 +213,8 @@ WITH (
 ALTER TABLE locations OWNER TO paul;
 
 
---sgd
-CREATE TABLE sgd
+--specificgravity
+CREATE TABLE specificgravity
 (
   loc_id integer NOT NULL,
   tube_num integer NOT NULL,
@@ -223,12 +223,12 @@ CREATE TABLE sgd
   mtot double precision,
   mp double precision,
   mps double precision,
-  CONSTRAINT sgd_pkey PRIMARY KEY (loc_id, tube_num)
+  CONSTRAINT specificgravity_pkey PRIMARY KEY (loc_id, tube_num)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE sgd OWNER TO paul;
+ALTER TABLE specificgravity OWNER TO paul;
 
 
 --sieve
@@ -264,8 +264,8 @@ WITH (
 ALTER TABLE tubes OWNER TO paul;
 
 
---WCS
-CREATE TABLE wcs
+--watercontent
+CREATE TABLE watercontent
 (
   loc_id integer NOT NULL,
   tube_num integer NOT NULL,
@@ -273,15 +273,15 @@ CREATE TABLE wcs
   mp double precision,
   mpsw double precision,
   mps double precision,
-  wcs_type integer,
+  wc_type integer,
   result double precision,
   note character varying(75),
-  CONSTRAINT wcs_pkey PRIMARY KEY (loc_id, tube_num, sn)
+  CONSTRAINT watercontent_pkey PRIMARY KEY (loc_id, tube_num, sn)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE wcs OWNER TO paul;
+ALTER TABLE watercontent OWNER TO paul;
 
 CREATE TABLE yieldstress
 (
@@ -300,22 +300,22 @@ WITH (
 );
 ALTER TABLE yieldstress OWNER TO paul;
 
-COPY codes FROM '/home/paul/Documents/bridgescour/data/codes.txt' WITH DELIMITER AS E'\t';
-COPY calib FROM '/home/paul/Documents/bridgescour/data/calib.txt' WITH DELIMITER AS E'\t';
-COPY tubes FROM '/home/paul/Documents/bridgescour/data/tubes.txt' WITH DELIMITER AS E'\t';
-COPY wcs FROM '/home/paul/Documents/bridgescour/data/wcs.txt' WITH DELIMITER AS E'\t';
-COPY sieve FROM '/home/paul/Documents/bridgescour/data/sieve.txt' WITH DELIMITER AS E'\t';
-COPY omd FROM '/home/paul/Documents/bridgescour/data/omd.txt' WITH DELIMITER AS E'\t';
-COPY locations FROM '/home/paul/Documents/bridgescour/data/locations.txt' WITH DELIMITER AS E'\t';
-COPY sgd FROM '/home/paul/Documents/bridgescour/data/sgd.txt' WITH DELIMITER AS E'\t';
-COPY hydrometer FROM '/home/paul/Documents/bridgescour/data/hydrometer.txt' WITH DELIMITER AS E'\t';
-COPY hydrometer_info FROM '/home/paul/Documents/bridgescour/data/hydrometer_info.txt' WITH DELIMITER AS E'\t';
-COPY extrusion_info FROM '/home/paul/Documents/bridgescour/data/extrusion_info.txt' WITH DELIMITER AS E'\t';
-COPY extrusion FROM '/home/paul/Documents/bridgescour/data/extrusion.txt' WITH DELIMITER AS E'\t';
-COPY erosion_info FROM '/home/paul/Documents/bridgescour/data/erosion_info.txt' WITH DELIMITER AS E'\t';
-COPY erosion FROM '/home/paul/Documents/bridgescour/data/erosion.txt' WITH DELIMITER AS E'\t';
-COPY yieldstress_info FROM '/home/paul/Documents/bridgescour/data/yieldstress_info.txt' WITH DELIMITER AS E'\t';
-COPY yieldstress FROM '/home/paul/Documents/bridgescour/data/yieldstress.txt' WITH DELIMITER AS E'\t';
+COPY codes FROM '/home/paul/Documents/bridgescour/data/lab/codes.txt' WITH DELIMITER AS E'\t';
+COPY calib FROM '/home/paul/Documents/bridgescour/data/lab/calib.txt' WITH DELIMITER AS E'\t';
+COPY tubes FROM '/home/paul/Documents/bridgescour/data/lab/tubes.txt' WITH DELIMITER AS E'\t';
+COPY watercontent FROM '/home/paul/Documents/bridgescour/data/lab/watercontent.txt' WITH DELIMITER AS E'\t';
+COPY sieve FROM '/home/paul/Documents/bridgescour/data/lab/sieve.txt' WITH DELIMITER AS E'\t';
+COPY organicmatter FROM '/home/paul/Documents/bridgescour/data/lab/organicmatter.txt' WITH DELIMITER AS E'\t';
+COPY locations FROM '/home/paul/Documents/bridgescour/data/lab/locations.txt' WITH DELIMITER AS E'\t';
+COPY specificgravity FROM '/home/paul/Documents/bridgescour/data/lab/specificgravity.txt' WITH DELIMITER AS E'\t';
+COPY hydrometer_info FROM '/home/paul/Documents/bridgescour/data/lab/hydrometer_info.txt' WITH DELIMITER AS E'\t';
+COPY hydrometer FROM '/home/paul/Documents/bridgescour/data/lab/hydrometer.txt' WITH DELIMITER AS E'\t';
+COPY extrusion_info FROM '/home/paul/Documents/bridgescour/data/lab/extrusion_info.txt' WITH DELIMITER AS E'\t';
+COPY extrusion FROM '/home/paul/Documents/bridgescour/data/lab/extrusion.txt' WITH DELIMITER AS E'\t';
+COPY erosion_info FROM '/home/paul/Documents/bridgescour/data/lab/erosion_info.txt' WITH DELIMITER AS E'\t';
+COPY erosion FROM '/home/paul/Documents/bridgescour/data/lab/erosion.txt' WITH DELIMITER AS E'\t';
+COPY yieldstress_info FROM '/home/paul/Documents/bridgescour/data/lab/yieldstress_info.txt' WITH DELIMITER AS E'\t';
+COPY yieldstress FROM '/home/paul/Documents/bridgescour/data/lab/yieldstress.txt' WITH DELIMITER AS E'\t';
 
 
 
@@ -352,8 +352,8 @@ ALTER TABLE erosion_info
       ON UPDATE CASCADE ON DELETE CASCADE;
       
 ALTER TABLE erosion_info
-  ADD CONSTRAINT erosion_info_to_wcs FOREIGN KEY (loc_id, tube_num, wcs_sn)
-      REFERENCES wcs (loc_id, tube_num, sn) MATCH SIMPLE
+  ADD CONSTRAINT erosion_info_to_watercontent FOREIGN KEY (loc_id, tube_num, wc_sn)
+      REFERENCES watercontent (loc_id, tube_num, sn) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
 ALTER TABLE erosion_info
@@ -367,8 +367,8 @@ ALTER TABLE extrusion_info
       ON UPDATE CASCADE ON DELETE CASCADE;
       
 ALTER TABLE extrusion_info
-  ADD CONSTRAINT extrusion_info_to_wcs FOREIGN KEY (loc_id, tube_num, wcs_sn)
-      REFERENCES wcs (loc_id, tube_num, sn) MATCH SIMPLE
+  ADD CONSTRAINT extrusion_info_to_watercontent FOREIGN KEY (loc_id, tube_num, wc_sn)
+      REFERENCES watercontent (loc_id, tube_num, sn) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
 ALTER TABLE hydrometer_info
@@ -377,8 +377,8 @@ ALTER TABLE hydrometer_info
       ON UPDATE CASCADE ON DELETE CASCADE;
       
 ALTER TABLE hydrometer_info
-  ADD CONSTRAINT hydrometer_info_to_wcs FOREIGN KEY (loc_id, tube_num, wcs_sn)
-      REFERENCES wcs (loc_id, tube_num, sn) MATCH SIMPLE
+  ADD CONSTRAINT hydrometer_info_to_watercontent FOREIGN KEY (loc_id, tube_num, wc_sn)
+      REFERENCES watercontent (loc_id, tube_num, sn) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
 ALTER TABLE yieldstress_info
@@ -386,13 +386,13 @@ ALTER TABLE yieldstress_info
       REFERENCES tubes (loc_id, num) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE omd
-  ADD CONSTRAINT omd_to_tubes FOREIGN KEY (loc_id, tube_num)
+ALTER TABLE organicmatter
+  ADD CONSTRAINT organicmatter_to_tubes FOREIGN KEY (loc_id, tube_num)
       REFERENCES tubes (loc_id, num) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE sgd
-  ADD CONSTRAINT sgd_to_tubes FOREIGN KEY (loc_id, tube_num)
+ALTER TABLE specificgravity
+  ADD CONSTRAINT specificgravity_to_tubes FOREIGN KEY (loc_id, tube_num)
       REFERENCES tubes (loc_id, num) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -401,13 +401,13 @@ ALTER TABLE sieve
       REFERENCES tubes (loc_id, num) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE wcs
-  ADD CONSTRAINT wcs_to_tubes FOREIGN KEY (loc_id, tube_num)
+ALTER TABLE watercontent
+  ADD CONSTRAINT watercontent_to_tubes FOREIGN KEY (loc_id, tube_num)
       REFERENCES tubes (loc_id, num) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
-ALTER TABLE wcs
-  ADD CONSTRAINT wcs_loookup FOREIGN KEY (wcs_type)
+ALTER TABLE watercontent
+  ADD CONSTRAINT watercontent_loookup FOREIGN KEY (wc_type)
       REFERENCES codes (code) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
       
