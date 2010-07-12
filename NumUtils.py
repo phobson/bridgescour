@@ -6,21 +6,21 @@ def bootstrapMedian(data, N=5000):
     '''
     import numpy as np
     import matplotlib.mlab as mlab
-    
+
     M = len(data)
     percentile = 50
-    
+
     estimate = np.array([])
     for k in range(N):
         bsIndex = np.random.random_integers(0,M-1,M)
         bsData = data[bsIndex]
         tmp = mlab.prctile(bsData, percentile)
         estimate = np.hstack((estimate, tmp))
-        
+
 
     CI = mlab.prctile(estimate, [2.5,97.5])
     med = np.mean(estimate)
-    
+
     return med, CI, estimate
 
 #---------------------------------------------
@@ -28,38 +28,36 @@ def linInterp(X,Y,x):
     '''DEPRECATED - CALL scipy.interpolate.interp1d instead
     '''
     from scipy.interpolate import interp1d
-    
+
     LI = interp1d(X,Y)
     y = LI(x)
     return y
-    
-   
-#---------------------------------------------   
+
+#---------------------------------------------
 def planeInterp(X,Y,Z,x,y):
     '''DEPRECATED - CALL scipy.interpolate.interp2d instead
     '''
     from scipy.interpolate import interp2d
-    
+
     PI = interp1d(X,Y,Z)
     z = PI(x,y)
     return z
 
-    
-#--------------------------------------------- 
+
+#---------------------------------------------
 def smoothData(x, d):
-            
     from numpy import zeros, mean, mod
     X = zeros(len(x))               # initialize output
-    for n in range(len(x)):            
+    for n in range(len(x)):
         if n-d < 0:
             n = range(0, n+d+1)
         elif n+d >= len(x):
             n = range(n-d, len(x))
         else:
             n = range(n-d, n+d+1)
-        
+
         X[n] = mean(x[n])
-        
+
     return X
 
 #---------------------------------------------
@@ -71,7 +69,7 @@ def savitsky_golay(data, kernel=11, order=4):
         - kernel => a positiv integer > 2*order giving the kernel size
         - order => order of the polynomal
         returns smoothed data as a numpy array
-            
+
         invoke like:
         smoothed = savitzky_golay(<rough>, [kernel = value], [order = value] )
     '''
@@ -106,40 +104,40 @@ def savitsky_golay(data, kernel=11, order=4):
 #---------------------------------------------
 def smooth(x, delta=11, type='hanning', order=4):
     '''smooth the data using a window with requested size.
-    
+
     This method is based on the convolution of a scaled window with the signal.
-    The signal is prepared by introducing reflected copies of the signal 
+    The signal is prepared by introducing reflected copies of the signal
     (with the window size) in both ends so that transient parts are minimized
     in the begining and end part of the output signal.
-    
+
     input:
-        x: the input signal 
-        window_len: the dimension of the smoothing window; 
+        x: the input signal
+        window_len: the dimension of the smoothing window;
                     should be an odd integer
-        window: the type of window 
+        window: the type of window
                 'flat', 'hanning', 'hamming', 'bartlett',
                 'blackman', or 'savitsky golay'
                 (flat window will produce a moving average smoothing)
     output:
         the smoothed signal
-        
+
     example:
 
     t=linspace(-2,2,0.1)
     x=sin(t)+randn(len(t))*0.1
     y=smooth(x)
-    
-    see also: 
-    
+
+    see also:
+
     numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
     scipy.signal.lfilter
     '''
     import numpy as np
-    
+
     if type == 'savitsky golay':
         smooth_data = savitsky_golay(x, kernel=delta, order=order)
-        
-    else:            
+
+    else:
         if x.ndim != 1:
             raise ValueError, "smooth only accepts 1 dimension arrays."
 
@@ -164,10 +162,10 @@ def smooth(x, delta=11, type='hanning', order=4):
 
         y = np.convolve(w/w.sum(),s,mode='same')
         smooth_data = y[delta-1:-delta+1]
-    
+
     return smooth_data
 
-#--------------------------------------------- 
+#---------------------------------------------
 def resampleData(t1, x1, d):
     '''
     N = 50 #length of series
@@ -278,7 +276,7 @@ def wholeCeil(val, order):
     return N
 
 #---------------------------------------------
-def linFit(x,y):
+def linFitR(x,y):
     '''
     linFit - LEAST-SQUARES METHOD OF CURVE FITTING TO LINEAR DATA 
     This function performs a least-square curve fitting on x & y based on
@@ -339,52 +337,59 @@ def linFit(x,y):
              "model" : fit[11]
              }
     return model, R_out
-    
+
+#---------------------------------------------
+def linFit(x,y):
+    x = None
+    return X
+
 #---------------------------------------------
 def powerFit(x,y):
     '''
     powerFit - LEAST-SQUARES METHOD OF CURVE FITTING - POWER FUNCTIONS
     This function performs a least-square curve fitting on x & y based on
     power function in the form y = a * x^b
-        
+
     Input:
       x - independent variable
       y - dependent variable
-        
+
     Output:
       This function fits data in the form of y = a * x^b:
       a and b are output.
-        
+
     Other functions called:
       NONE
-        
+
     Example:
         >>> import LinearRegressions as LR
         >>> a, b = LR.powerFin(x, y);
     +-----------------------------------+
     | Paul M. Hobson             __o    |
-    | phobson@geosyntec.com    _`\<,_   | 
+    | phobson@geosyntec.com    _`\<,_   |
     | 2009/03/11              (_)/ (_)  |
     +-----------------------------------+
-    '''	
+    '''
     # import all that stuff
     import numpy as np
- 
+    import scipy.stats as stats
+
     # take natural logs of the data
-    X = np.log(x); 
-    Y = np.log(y);
-    
-    # create model
-    E = np.zeros([len(Y),2]);
-    E[:,0] = 1;
-    E[:,1] = X;
- 
+    X = np.log(x)
+    Y = np.log(y)
+    a, b = stats.linregress(X,Y)[:2]
+
+    ## create model
+    #E = np.zeros([len(Y),2])
+    #E[:,0] = 1
+    #E[:,1] = x.T
+
     # evaluate model
-    X1 = np.dot(np.transpose(E),E)
-    X2 = np.dot(np.transpose(E),Y)
-    Xhat = np.dot(np.linalg.inv(X1),X2)
-    a = np.exp(Xhat[0]);
-    b = Xhat[1];
+    #X1 = np.dot(np.transpose(E),E)
+    #X2 = np.dot(np.transpose(E),Y)
+    #Xhat = np.dot(np.linalg.inv(X1),X2)
+    #a = np.exp(Xhat[0]);
+    #b = Xhat[1];
     return a,b
     
 #---------------------------------------------

@@ -35,7 +35,7 @@ def waterContent(loc_id, tube_num, sn):
     '''
 
     cmd = """SELECT mpsw, mps, mp
-             FROM wcs
+             FROM watercontent
              WHERE loc_id = %d
                AND tube_num = %d
                AND sn = %s""" % (loc_id, tube_num, sn)
@@ -63,7 +63,7 @@ def specificGravity(loc_id, tube_num):
 
     pyncCF = getCalibFactors(302)
     cmd = """SELECT mpync, mtot, mp, mps, temperature
-             FROM sgd
+             FROM specificgravity
              WHERE loc_id = %d
                AND tube_num = %d""" % (loc_id, tube_num)
     cnn, cur = connectToDB(cmd)
@@ -80,7 +80,7 @@ def specificGravity(loc_id, tube_num):
 
 def organicMatterConent(loc_id, tube_num):
     cmd = """SELECT mpsa, mps, mp
-             FROM omd
+             FROM organicmatter
              WHERE loc_id = %d
                AND tube_num = %d""" % (loc_id, tube_num)
     cnn, cur = connectToDB(cmd)
@@ -246,7 +246,7 @@ def grainSize(loc_id, tube_num, plot=False):
         fig.savefig('%s%d.pdf' % (tubeInfo[0], tube_num),
                     dpi=300, bbox_inches='tight')
         pl.close(fig)
-    
+
     cur.close()
     cnn.close()
     return D, PF, Label
@@ -257,7 +257,7 @@ def liquidLimit(loc_id, tube_num):
     import numpy as np
 
     cmd = """SELECT sn, result, wcs_type
-             FROM wcs
+             FROM  watercontent
              WHERE loc_id = %d
              AND tube_num = %d
              AND wcs_type IN (203,204)""" % (loc_id, tube_num)
@@ -279,10 +279,11 @@ def plasticLimit(loc_id, tube_num):
     '''
     import numpy as np
 
-    cmd = """SELECT sn FROM wcs
+    cmd = """SELECT sn
+             FROM watercontent
              WHERE loc_id = %d
-             AND tube_num = %d
-             AND wcs_type = 205""" % (loc_id, tube_num)
+               AND tube_num = %d
+               AND wcs_type = 205""" % (loc_id, tube_num)
     cnn, cur = connectToDB(cmd)
     wc = np.array([])
     for row in cur:
@@ -342,7 +343,7 @@ def atterbergLimits(loc_id, tube_num, plot=0):
             ax1 = fig.add_subplot(111)
             plotLLandPL(ax1, LegLoc, wc, fit, LL, PL, x, x_, P, xlab, dlab)
             fig.savefig('LiquidLimit_%d-%d.pdf' % (loc_id, tube_num))
-            
+
         if plot == 2:
             fig = pl.figure(figsize=(5,3.5))
             ax1 = fig.add_subplot(111)
@@ -356,7 +357,7 @@ def atterbergLimits(loc_id, tube_num, plot=0):
             plotLL(ax1, LegLoc, wc, fit, LL, PL, x, x_, P, xlab, dlab)
             plasticityChart(ax2, [LL*100], [PL*100], [loc_id], [tube_num])
             fig.savefig('Atterbergs%d-%d.pdf' % (loc_id, tube_num))
-            
+
     pl.close(fig)
 
     return LL, PL

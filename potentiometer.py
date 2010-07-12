@@ -39,8 +39,8 @@ def getExtrusionData(loc_id, tube_num, sn):
            in1, in2,
            msw,
            note,
-           wcs_sn
-    FROM luextrusion
+           wc_sn
+    FROM extrusion_info
     WHERE loc_id   = %d
       AND tube_num = %d
       AND sn       = %d
@@ -53,7 +53,7 @@ def getExtrusionData(loc_id, tube_num, sn):
             'index' : (test[2], test[3]),
             'mss' : test[4],
             'note' : test[5],
-            'wcs_sn' : test[6]}
+            'wc_sn' : test[6]}
 
     cur.close()
     cnn.close()
@@ -62,18 +62,18 @@ def getExtrusionData(loc_id, tube_num, sn):
 def getErosionData(loc_id, tube_num, sn):
     t,d = getPotData(loc_id, tube_num, sn, 'erosion')
     cmd = """
-    SELECT LUE.sf,
-           LUE.tau,
-           LUE.dur,
-             C.descr,
-           LUE.note,
-           LUE.wcs_sn,
-           LUE.ext_sn
-    FROM luerosion LUE
-    INNER JOIN codes C on C.code = LUE.erosion_type
-    WHERE LUE.loc_id   = %d
-      AND LUE.tube_num = %d
-      AND LUE.sn       = %d
+    SELECT EI.sf,
+           EI.tau,
+           EI.dur,
+            C.descr,
+           EI.note,
+           EI.wc_sn,
+           EI.ext_sn
+    FROM erosion_info EI
+    INNER JOIN codes C on C.code = EI.erosion_type
+    WHERE EI.loc_id   = %d
+      AND EI.tube_num = %d
+      AND EI.sn       = %d
     """ % (loc_id, tube_num, sn)
     cnn, cur = connectToDB(cmd)
     test = cur.fetchone()
@@ -83,7 +83,7 @@ def getErosionData(loc_id, tube_num, sn):
                 'dur' : test[2],
                 'type' : test[3],
                 'note' : test[4],
-                'wcs_sn' : test[5],
+                'wc_sn' : test[5],
                 'ext_sn' : test[6]}
 
     cur.close()
@@ -100,39 +100,38 @@ def extrusionLength(loc_id, tube_num, sn):
     return h
 
 
-def __test_getAllData():
-    Tables = ['erosion', 'luerosion', 'extrusion', 'luextrusion']
-    for table in Tables:
-        cmd = """
-        SELECT DISTINCT loc_id, tube_num, sn
-        FROM %s""" % table
-        cnn, cur = connectToDB(cmd)
-        loc_id = []
-        tube_num = []
-        sn = []
-        for c in cur:
-            loc_id.append(c[0])
-            tube_num.append(c[1])
-            sn.append(c[2])
+def __test_getAllData(table):
+    #Tables = ['erosion', 'erosion_info', 'extrusion', 'extrusion_info']
+    cmd = """
+    SELECT DISTINCT loc_id, tube_num, sn
+    FROM %s""" % table
+    cnn, cur = connectToDB(cmd)
+    loc_id = []
+    tube_num = []
+    sn = []
+    for c in cur:
+        loc_id.append(c[0])
+        tube_num.append(c[1])
+        sn.append(c[2])
 
     return loc_id, tube_num, sn
 
 def __test_getPotData():
-    Tables = ['erosion', 'luerosion', 'extrusion', 'luextrusion']
+    Tables = ['erosion', 'erosion_info', 'extrusion', 'extrusion_info']
     for table in Tables:
         loc_id, tube_num, sam_num = __test_getAllData(table)
         for lid, tnum, snum in zip(loc_id, tube_num, sam_num):
             t,d = getPotData(lid, tnum, snum, 'extrusion')
 
 def __test_getExtrusionData():
-    Tables = ['extrusion', 'luextrusion']
+    Tables = ['extrusion', 'extrusion_info']
     for table in Tables:
         loc_id, tube_num, sam_num = __test_getAllData(table)
         for lid, tnum, snum in zip(loc_id, tube_num, sam_num):
             t, d, info = getExtrusionData(lid, tnum, snum)
 
 def __test_getErosionData():
-    Tables = ['erosion', 'luerosion']
+    Tables = ['erosion', 'erosion_info']
     for table in Tables:
         loc_id, tube_num, sam_num = __test_getAllData(table)
         for lid, tnum, snum in zip(loc_id, tube_num, sam_num):
@@ -141,7 +140,7 @@ def __test_getErosionData():
 
 def __test_extrusionLength():
     h = []
-    Tables = ['extrusion', 'luextrusion']
+    Tables = ['extrusion', 'extrusion_info']
     for table in Tables:
         loc_id, tube_num, sam_num = __test_getAllData(table)
         for lid, tnum, snum in zip(loc_id, tube_num, sam_num):
@@ -149,7 +148,7 @@ def __test_extrusionLength():
     return h
 
 def __test_potentiometer():
-    __test_getAllData():
+    #__test_getAllData()
     __test_getPotData()
     __test_getExtrusionData()
     __test_getErosionData()
