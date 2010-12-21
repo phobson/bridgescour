@@ -65,13 +65,12 @@ def rheoWaterContent(rheoInfo):
     wc = Mw/Ms
     return wc
 
-def yieldStress(rheoData, rheoInfo):
+def lowerYieldStress(rheoData, rheoInfo):
+
     import numpy as np
-    import matplotlib.pyplot as pl
     import NumUtils as nu
     g, t, gd = (rheoData['gamma'], rheoData['tau'], rheoData['gammadot'])
     LI = rheoInfo['lowerN']
-    UI = rheoInfo['upperN']
 
     # lower yield stress
     gL1 = g[LI[0,0]:LI[0,1]]
@@ -82,6 +81,21 @@ def yieldStress(rheoData, rheoInfo):
 
     aL1, bL1 = nu.powerFit(tL1, gL1)
     aL2, bL2 = nu.powerFit(tL2, gL2)
+
+
+    tau_y = np.exp(np.log(aL2/aL1)/(bL1/bL2))
+    lys = {'lowerYS' : tau_y,
+          'gamma_y' : aL1 * tau_y**bL1,
+          'fit'     : np.array([[aL1, bL1],[aL2, bL2]])}
+
+    return ys
+
+def upperYieldStress(rheoData, rheoInfo):
+    import numpy as np
+    import NumUtils as nu
+
+    g, t, gd = (rheoData['gamma'], rheoData['tau'], rheoData['gammadot'])
+    UI = rheoInfo['upperN']
 
     # upper yield stress
     gdU1 = gd[UI[0,0]:UI[0,1]]
@@ -95,24 +109,17 @@ def yieldStress(rheoData, rheoInfo):
     mU2, rU2 = nu.linFit(gdU2, tU2)
     m2, b2 = (mU2[0], mU2[1])
 
-    tau_y = {'lower' : np.exp(np.log(aL2/aL1)/(bL1/bL2)),
-             'upper' : (b2-b1)/(m1-m2)}
-
-    ys = {'lowerYS' : np.exp(np.log(aL2/aL1)/(bL1/bL2)),
-          'upperYS' : (b2-b1)/(m1-m2),
-          'gamma_y' : aL1 * tau_y['lower']**bL1,
-          'gammadot_y' : m1*tau_y['upper'] + b1,
-          'lowerfit' : np.array([[aL1, bL1],[aL2, bL2]]),
-          'upperfit' : np.array([[m1, b1],[m2.b2]])}
-
-    return ys
+    tau_y = (b2-b1)/(m1-m2)
+    uys = {'upperYS' : tau_y,
+           'gammadot_y'   : (tau_y-b1)/m1,
+           'fit' : np.array([[m1,b1],[m2,b2]])}
 
 def plotRheoData(rheoData, rheoInfo):
     import numpy as np
     import matplotlib.pyplot as pl
     #rheoData = getRheoData(loc_id, tube_num, sn)
     #rheoInfo = getRheoInfo(loc_id, tube_num, sn)
-    ys = yieldStress(rheoData, rheoInfo)
+    ys = upperYieldStress(rheoData, rheoInfo)
     g, t, gd = (rheoData['gamma'], rheoData['tau'], rheoData['gammadot'])
     LI = rheoInfo['lowerN']
     UI = rheoInfo['upperN']

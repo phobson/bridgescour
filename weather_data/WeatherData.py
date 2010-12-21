@@ -49,10 +49,34 @@ import datetime as dt
 import numpy as np
 import re
 import psycopg2 as db
+import os
 #import pyodbc as db
 ## except:
 ##     print '''Don't have all of the required libraries:
 ##             Numpy, pyodbc, and matplotlib are the likely problems.'''
+
+def connectToDB(cmd=None)
+    cnn = db.connect(database='weather', host='localhost',
+                     user='paul', password='violawould')
+    cur = cnn.cursor()
+    if cmd:
+        cur.execute(cmd)
+
+    return cnn, cur
+
+
+def wgetASOS(sta, year):
+    cmd = """
+    SELECT filedate
+    FROM files
+    WHERE filedate BETWEEN %d00 AND %d00
+      AND sta = '$s';
+    """ % (year, year+1, sta)
+    cnn, cur = connectToDB(cmd)
+    os.system('')
+
+    cur.close()
+    cnn.close()
 
 
 def fileGetter(STA, date, type, file, header=False):
@@ -502,25 +526,6 @@ def useASOS(fname, RT):
     return dt, p, wind, bp, tdh
 
 def sqlASOS(fname, uid, pwd, staType='ASOS', RT=55):
-    '''
-       Column   |          Type          | Modifiers
-    ------------+------------------------+-----------
-     sta        | character varying(15)  |
-     type       | character varying(50)  |
-     obsdate    | date                   |
-     obstime    | time without time zone |
-     rain       | double precision       |
-     winddir    | smallint               |
-     winddirmin | smallint               |
-     winddirmax | smallint               |
-     windspd    | smallint               |
-     windgust   | smallint               |
-     temp       | smallint               |
-     humid      | smallint               |
-     dewpnt     | smallint               |
-     baro       | real                   |
-
-    '''
     #cnn = db.connect(driver='{SQL Server}',
     #            server='POR-PHOBSON\SQLEXPRESS',
     #            database='weather',

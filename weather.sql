@@ -1,5 +1,6 @@
 CREATE TABLE observations (
     sta_id character varying(4),
+    filedate smallint,
     obsdate date,
     obstime time without time zone,
     rain real,
@@ -11,7 +12,8 @@ CREATE TABLE observations (
     temp smallint,
     humid smallint,
     dewpnt smallint,
-    baro real
+    baro real,
+    maintenance boolean default false
 );
 
 CREATE TABLE files

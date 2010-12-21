@@ -27,6 +27,7 @@ def getCalibFactors(calib_type):
              WHERE calib_type = %d""" % (calib_type)
     cnn, cur = connectToDB(cmd)
     CF = cur.fetchone()[1:]
-    return CF
+    
     cur.close()
     cnn.close()
+    return CF
