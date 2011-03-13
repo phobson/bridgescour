@@ -1,3 +1,6 @@
+#TODO fix everything!
+#TODO help help
+
 def bootstrapMedian(data, N=5000):
     '''Bootstraper to refine estimate of a percentile from data
     N = number of iterations for the bootstrapping

@@ -21,13 +21,13 @@ def connectToDB(cmd=None):
         cur.execute(cmd)
 
     return cnn, cur
-    
+
 def getCalibFactors(calib_type):
     cmd = """SELECT * FROM calib
              WHERE calib_type = %d""" % (calib_type)
     cnn, cur = connectToDB(cmd)
     CF = cur.fetchone()[1:]
-    
+
     cur.close()
     cnn.close()
     return CF

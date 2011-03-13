@@ -1,3 +1,5 @@
+# TODO finshin this shit
+# TODO email dr strum
 '''
 GEOTECH.PY
 Performs all calculations related to the geotechnical aspects of samples tested 
@@ -21,6 +23,11 @@ See individual docstrings for help.
 '''
 
 from __future__ import division
+import numpy as np
+import scipy.interpolate as spi
+import matplotlib.pyplot as pl
+import scipy.stats as sps
+import matplotlib.ticker as mt
 from MiscUtils import connectToDB, getCalibFactors
 
 def waterContent(loc_id, tube_num, sn):
@@ -94,9 +101,6 @@ def organicMatterConent(loc_id, tube_num):
     return om
 
 def grainSize(loc_id, tube_num, plot=False):
-    import numpy as np
-    import scipy.interpolate as spi
-    import matplotlib.pyplot as pl
 
     # set up tables for hydrometer analysis (ASTM D 422)
     Table1 = {'SG'    : np.arange(2.45, 3.00, 0.05),
@@ -233,7 +237,6 @@ def grainSize(loc_id, tube_num, plot=False):
         Label = '%s %0.1f ft to %0.1f ft' % tubeInfo
         print(Label)
 
-        import matplotlib.pyplot as pl
         fig = pl.figure()
         ax = fig.add_subplot(111)
         ax.plot(D, PF, 'ko', ms=6, label=Label)
@@ -254,7 +257,6 @@ def grainSize(loc_id, tube_num, plot=False):
 def liquidLimit(loc_id, tube_num):
     '''LIQUID LIMIT OF A SOIL SAMPLE
     '''
-    import numpy as np
 
     cmd = """SELECT sn, result, wcs_type
              FROM  watercontent
@@ -277,7 +279,6 @@ def liquidLimit(loc_id, tube_num):
 def plasticLimit(loc_id, tube_num):
     '''PLASTIC LIMIT OF A SOIL SAMPLe
     '''
-    import numpy as np
 
     cmd = """SELECT sn
              FROM watercontent
@@ -313,9 +314,6 @@ def atterbergLimits(loc_id, tube_num, plot=0):
         LL - liquid limit
         PL - plastic limit
     '''
-    import numpy as np
-    import scipy.stats as sps
-    import matplotlib.pyplot as pl
 
     wc, x, LL_type = liquidLimit(loc_id, tube_num)
     fit = sps.linregress(np.log10(x), wc)
@@ -364,8 +362,6 @@ def atterbergLimits(loc_id, tube_num, plot=0):
 
 
 def plotLL(ax1, LegLoc, wc, fit, LL, PL, x, x_, P, xlab, dlab):
-    import matplotlib.ticker as mt
-    import numpy as np
 
     axFmt = mt.FormatStrFormatter('%d')
     ax1.plot(x, wc,'ko', label=dlab, zorder=10, mfc='none', mew=1, ms=4)
@@ -384,8 +380,6 @@ def plotLL(ax1, LegLoc, wc, fit, LL, PL, x, x_, P, xlab, dlab):
 
 def plasticityChart(ax, LL, PL, loc_id, tube_num):
     '''Plots standard plasticity chart'''
-    import numpy as np
-    import matplotlib.pyplot as pl
 
     # x-axis and standard lines
     wLL = np.arange(141)
